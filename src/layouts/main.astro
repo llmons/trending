@@ -40,9 +40,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null
       // A `?theme=light|dark` query param overrides the stored preference.
       try {
         const forced = new URLSearchParams(location.search).get("theme")
-        const stored =
-          localStorage.getItem("trending:theme") ??
-          localStorage.getItem("lang-trending:theme")
+        const stored = localStorage.getItem("trending:theme")
         const dark = forced
           ? forced === "dark"
           : stored
