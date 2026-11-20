@@ -5,7 +5,7 @@ import { useSyncExternalStore } from "react"
 
 import { Button } from "@/components/ui/button"
 
-const STORAGE_KEY = "lang-trending:theme"
+const STORAGE_KEY = "trending:theme"
 
 /** The `<html>` class attribute is the single source of truth for the theme. */
 function getDarkSnapshot(): boolean {

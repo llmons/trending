@@ -24,7 +24,7 @@ const BASE_HEADERS = {
   Accept: "application/vnd.github+json",
   "X-GitHub-Api-Version": "2022-11-28",
   // GitHub requires a User-Agent on every API request.
-  "User-Agent": "lang-trending (https://github.com/llmons/lang-trending)",
+  "User-Agent": "trending (https://github.com/llmons/lang-trending)",
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
