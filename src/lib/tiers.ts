@@ -42,6 +42,11 @@ export interface RankingsMeta {
   generatedAt: string
   window: { from: string; to: string }
   languagesTracked: number
+  /**
+   * True when the counts are synthetic — a local `TRENDING_MOCK=1` build.
+   * Pages must show a sample-data notice and stay `noindex` in that case.
+   */
+  sample: boolean
 }
 
 export interface RankedLanguage extends LanguageMeta {

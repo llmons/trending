@@ -9,7 +9,9 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "dev:mock": "TRENDING_MOCK=1 astro dev",
     "build": "astro build",
+    "build:mock": "TRENDING_MOCK=1 astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint .",

@@ -39,7 +39,7 @@ const languageDescription =
 const description =
   `Ranking of mainstream programming languages by new GitHub repositories created ` +
   `between ${formatDate(meta.window.from)} and ${formatDate(meta.window.to)} ` +
-  `(inclusive star tiers at 2, 20, and 100 stars), plus Go web and microservice frameworks ` +
+  `(inclusive star tiers at 2, 20, and 100 stars), plus Go web and RPC frameworks ` +
   `ranked by pkg.go.dev imported-by counts. Rebuilt daily.`
 
 const datasetSchema = {
@@ -56,7 +56,16 @@ const datasetSchema = {
 <Layout
   title="trending — programming languages ranked by GitHub activity"
   description={description}
+  noindex={meta.sample}
 >
+  {meta.sample && (
+    <div class="border-b border-border bg-muted/40">
+      <p class="mx-auto w-full max-w-6xl px-6 py-2.5 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+        Sample data · GitHub counts are synthetic (local mock build) — Go
+        framework counts stay live
+      </p>
+    </div>
+  )}
   <Hero data={data} />
   <Ticker ranked={tiers.ge2.ranked} />
 
@@ -106,8 +115,8 @@ const datasetSchema = {
           <div>
             <CardTitle>More rankings</CardTitle>
             <CardDescription className="mt-2 max-w-xl">
-              Go web & microservice frameworks, ranked by how many packages
-              import them — live on pkg.go.dev data.
+              Go web & RPC frameworks, ranked by how many packages import them —
+              live on pkg.go.dev data.
             </CardDescription>
           </div>
           <a href={`${base}go/`} class={buttonVariants({ variant: "outline" })}>

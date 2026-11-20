@@ -7,11 +7,14 @@ import SiteHeader from "@/components/site-header.astro"
 interface Props {
   title?: string
   description?: string
+  /** Keep sample pages out of search results (local mock builds). */
+  noindex?: boolean
 }
 
 const {
   title = "trending — what the world is building",
-  description = "Daily rankings of what the world is building: GitHub-created-repo rankings of mainstream programming languages, plus pkg.go.dev imported-by rankings of Go web and microservice frameworks — rebuilt every day.",
+  description = "Daily rankings of what the world is building: GitHub-created-repo rankings of mainstream programming languages, plus pkg.go.dev imported-by rankings of Go web and RPC frameworks — rebuilt every day.",
+  noindex = false,
 } = Astro.props
 
 const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null
@@ -31,6 +34,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null
     />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />

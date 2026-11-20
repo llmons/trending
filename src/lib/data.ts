@@ -21,8 +21,15 @@
  * module's top-level await — into the browser bundle and every visitor
  * would start a 117-request fetch. Client code imports the data model
  * from `@/lib/tiers` instead.
+ *
+ * Mock builds: `TRENDING_MOCK=1` (`pnpm build:mock` / `pnpm dev:mock`) swaps
+ * ONLY the GitHub counts for the synthetic table in
+ * `@/lib/fixtures/github-counts` — the rolling window, the tier/weighted/
+ * category derivations, and the pkg.go.dev pipeline all stay untouched. CI
+ * refuses the flag outright, so fake numbers can never be deployed.
  */
 
+import { MOCK_GITHUB_COUNTS } from "@/lib/fixtures/github-counts"
 import {
   AUTHENTICATED_INTERVAL_MS,
   UNAUTHENTICATED_INTERVAL_MS,
@@ -62,8 +69,8 @@ function buildQuery(
   return `language:${language} fork:false mirror:false ${stars}${createdQualifier(window)}`
 }
 
-/** Per-language, per-tier counts, filled by the fetch rounds. */
-const counts = new Map<string, number>()
+/** Per-language, per-tier counts, keyed `${languageId}:${tierId}`. */
+type Counts = Map<string, number>
 
 /**
  * The auto-injected `GITHUB_TOKEN` from GitHub Actions. Present in CI, absent
@@ -76,10 +83,26 @@ const requestInterval = githubToken
 const requestRate = githubToken ? 30 : 10
 const requestMode = githubToken ? "authenticated" : "unauthenticated"
 
+/**
+ * Local mock builds (`pnpm build:mock` / `pnpm dev:mock`) replace only the
+ * GitHub search counts with the synthetic fixture. The flag is refused in CI
+ * so a fake dataset can never reach the deployed site.
+ */
+const useMock = process.env.TRENDING_MOCK === "1"
+if (
+  useMock &&
+  (process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true")
+) {
+  throw new Error(
+    "TRENDING_MOCK is local-only — CI must fetch the real GitHub counts."
+  )
+}
+
 /** One round of per-language fetches. Returns the languages that failed. */
 async function fetchCountsRound(
   pending: readonly LanguageMeta[],
-  window: RollingWindow
+  window: RollingWindow,
+  counts: Counts
 ): Promise<LanguageMeta[]> {
   const failed: LanguageMeta[] = []
   for (const [index, language] of pending.entries()) {
@@ -104,12 +127,13 @@ async function fetchCountsRound(
   return failed
 }
 
-async function fetchRankings(): Promise<Rankings> {
-  const current = rollingWindow()
+/** Live path: 117 paced GitHub searches, plus recovery rounds. */
+async function fetchCounts(window: RollingWindow): Promise<Counts> {
+  const counts: Counts = new Map()
 
   console.log(
     `Fetching live data from the GitHub search API\n` +
-      `  window:    ${toDatePart(current.from)} .. ${toDatePart(current.to)}\n` +
+      `  window:    ${toDatePart(window.from)} .. ${toDatePart(window.to)}\n` +
       `  languages: ${LANGUAGE_CATALOG.length} × ${STAR_TIERS.length} tiers = ${LANGUAGE_CATALOG.length * STAR_TIERS.length} requests (${requestMode}, paced at ${requestRate} req/min)`
   )
 
@@ -128,7 +152,7 @@ async function fetchRankings(): Promise<Rankings> {
       )
       await new Promise((resolve) => setTimeout(resolve, cooldowns[round - 1]))
     }
-    pending = await fetchCountsRound(pending, current)
+    pending = await fetchCountsRound(pending, window, counts)
   }
 
   if (pending.length > 0) {
@@ -137,6 +161,15 @@ async function fetchRankings(): Promise<Rankings> {
     )
   }
 
+  return counts
+}
+
+/**
+ * Aggregation over one counts table. Shared by the live and the mock path, so
+ * a mock build exercises the exact same ranking, share, category, and
+ * weighted-score arithmetic as production.
+ */
+function deriveRankings(counts: Counts, window: RollingWindow): Rankings {
   const tiers = {} as Record<TierId, TierRanking>
   for (const tier of STAR_TIERS) {
     const ranked: RankedLanguage[] = LANGUAGE_CATALOG.map((language) => {
@@ -190,8 +223,9 @@ async function fetchRankings(): Promise<Rankings> {
   return {
     meta: {
       generatedAt: new Date().toISOString(),
-      window: { from: toDatePart(current.from), to: toDatePart(current.to) },
+      window: { from: toDatePart(window.from), to: toDatePart(window.to) },
       languagesTracked: LANGUAGE_CATALOG.length,
+      sample: useMock,
     },
     tiers,
     weighted: {
@@ -202,8 +236,33 @@ async function fetchRankings(): Promise<Rankings> {
   }
 }
 
+/** Synthetic counts, validated against the catalog so catalog drift fails loudly. */
+function loadMockCounts(): Counts {
+  const counts: Counts = new Map()
+  for (const language of LANGUAGE_CATALOG) {
+    const row = MOCK_GITHUB_COUNTS[language.id]
+    if (!row) throw new Error(`Missing mock GitHub counts for ${language.id}`)
+    for (const tier of STAR_TIERS) {
+      counts.set(`${language.id}:${tier.id}`, row[tier.id])
+    }
+  }
+  return counts
+}
+
+/** Counts for this build: live GitHub, unless `TRENDING_MOCK=1`. */
+async function computeRankings(): Promise<Rankings> {
+  const window = rollingWindow()
+  if (useMock) {
+    console.log(
+      "⚠ MOCK GitHub counts (TRENDING_MOCK=1) — language numbers are synthetic; pkg.go.dev counts stay live."
+    )
+    return deriveRankings(loadMockCounts(), window)
+  }
+  return deriveRankings(await fetchCounts(window), window)
+}
+
 // One fetch per build — module-level top-level await, shared by all pages.
-const rankings: Rankings = await fetchRankings().catch((error) => {
+const rankings: Rankings = await computeRankings().catch((error) => {
   throw new Error(
     `Ranking fetch failed — the site cannot be built without fresh data.\n${error}`
   )
