@@ -11,7 +11,7 @@
  * and client-side islands may import it.
  */
 
-export type FrameworkCategory = "web" | "micro"
+export type FrameworkCategory = "web" | "rpc"
 
 export interface FrameworkMeta {
   /** Stable slug used as the identifier across the site. */
@@ -32,23 +32,13 @@ export interface FrameworkMeta {
 export const FRAMEWORK_CATALOG: readonly FrameworkMeta[] = [
   {
     id: "gin",
-    name: "gin",
+    name: "Gin",
     importPath: "github.com/gin-gonic/gin",
     category: "web",
     repoUrl: "https://github.com/gin-gonic/gin",
     color: "#008ecb",
     blurb:
       "Battle-tested HTTP framework with a martini-like API, by Manu Arora.",
-  },
-  {
-    id: "hertz",
-    name: "Hertz",
-    importPath: "github.com/cloudwego/hertz/pkg/app",
-    category: "web",
-    repoUrl: "https://github.com/cloudwego/hertz",
-    color: "#3e63dd",
-    blurb:
-      "CloudWeGo's high-performance HTTP framework, built for low latency.",
   },
   {
     id: "echo",
@@ -71,16 +61,6 @@ export const FRAMEWORK_CATALOG: readonly FrameworkMeta[] = [
       "Express-inspired API layer running on top of the fast fasthttp engine.",
   },
   {
-    id: "chi",
-    name: "Chi",
-    importPath: "github.com/go-chi/chi/v5",
-    category: "web",
-    repoUrl: "https://github.com/go-chi/chi",
-    color: "#36b37e",
-    blurb:
-      "Lightweight router that stays close to the standard net/http ecosystem.",
-  },
-  {
     id: "goframe",
     name: "GoFrame",
     importPath: "github.com/gogf/gf/v2/frame/g",
@@ -91,52 +71,53 @@ export const FRAMEWORK_CATALOG: readonly FrameworkMeta[] = [
       "Batteries-included full-stack framework with ORM, cache, and CLI tooling.",
   },
   {
+    id: "hertz",
+    name: "Hertz",
+    importPath: "github.com/cloudwego/hertz/pkg/app",
+    category: "web",
+    repoUrl: "https://github.com/cloudwego/hertz",
+    color: "#3e63dd",
+    blurb:
+      "CloudWeGo's high-performance HTTP framework, built for low latency.",
+  },
+  {
     id: "grpc-go",
     name: "gRPC-Go",
     importPath: "google.golang.org/grpc",
-    category: "micro",
+    category: "rpc",
     repoUrl: "https://github.com/grpc/grpc-go",
     color: "#2fa4e7",
     blurb:
       "Canonical Go implementation of gRPC, maintained by the gRPC project.",
   },
   {
+    id: "thrift",
+    name: "Thrift",
+    importPath: "github.com/apache/thrift/lib/go/thrift",
+    category: "rpc",
+    repoUrl: "https://github.com/apache/thrift",
+    color: "#d97757",
+    blurb:
+      "Apache Thrift's cross-language RPC and serialization stack, with an official Go library.",
+  },
+  {
+    id: "dubbo",
+    name: "Dubbo",
+    importPath: "dubbo.apache.org/dubbo-go/v3",
+    category: "rpc",
+    repoUrl: "https://github.com/apache/dubbo-go",
+    color: "#e8a33d",
+    blurb:
+      "Apache Dubbo's Go implementation — Java-born RPC extended to Go services.",
+  },
+  {
     id: "kitex",
     name: "Kitex",
     importPath: "github.com/cloudwego/kitex/server",
-    category: "micro",
+    category: "rpc",
     repoUrl: "https://github.com/cloudwego/kitex",
     color: "#e5484d",
     blurb:
       "CloudWeGo's RPC framework with codegen-first ergonomics and high throughput.",
-  },
-  {
-    id: "kratos",
-    name: "Kratos",
-    importPath: "github.com/go-kratos/kratos/v2",
-    category: "micro",
-    repoUrl: "https://github.com/go-kratos/kratos",
-    color: "#8a63d2",
-    blurb: "Protocol-first microservice framework, born at Bilibili.",
-  },
-  {
-    id: "go-zero",
-    name: "go-zero",
-    importPath: "github.com/zeromicro/go-zero/zrpc",
-    category: "micro",
-    repoUrl: "https://github.com/zeromicro/go-zero",
-    color: "#00c4cc",
-    blurb:
-      "Microservice framework with built-in code generation for APIs and RPC.",
-  },
-  {
-    id: "go-micro",
-    name: "Go-Micro",
-    importPath: "github.com/asim/go-micro/v3",
-    category: "micro",
-    repoUrl: "https://github.com/asim/go-micro",
-    color: "#d97757",
-    blurb:
-      "Original service-framework toolkit, continued under asim's maintenance.",
   },
 ] as const

@@ -47,7 +47,7 @@ const FAQS = [
   {
     question: "How are the Go framework rankings measured?",
     answer:
-      "Each framework is counted at one canonical package — the import its quickstart tells you to make — using pkg.go.dev's official imported-by API, which returns how many packages in the public Go module universe import it directly. Unlike the language ranking's rolling one-year window, this is a cumulative snapshot rebuilt daily, measuring adoption stock rather than new activity. The fetch is ~11 keyless requests paced at one per second, and a failed count fails the build.",
+      "Each framework is counted at one canonical package — the import its quickstart tells you to make — using pkg.go.dev's official imported-by API, which returns how many packages in the public Go module universe import it directly. Unlike the language ranking's rolling one-year window, this is a cumulative snapshot rebuilt daily, measuring adoption stock rather than new activity. The fetch is ~9 keyless requests paced at one per second, and a failed count fails the build.",
   },
   {
     question: "Why not GitHub stars or download counts for frameworks?",

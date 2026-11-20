@@ -6,7 +6,7 @@
  * top-level await below runs a single time per build and every page shares
  * the resolved result — then renders as static HTML from it.
  *
- * One keyless request per framework — ~11 lookups paced at one per second,
+ * One keyless request per framework — ~9 lookups paced at one per second,
  * a few seconds of fetch time. If a fetch ultimately fails the build fails
  * too and the previously deployed site stays online: same all-or-nothing
  * principle as `data.ts`, no stale-data fallback.
@@ -16,7 +16,7 @@
  * ⚠ Server-only: never import a VALUE from this module in client code
  * (islands). The bundler would ship the fetch pipeline — including this
  * module's top-level await — into the browser bundle and every visitor
- * would start an ~11-request fetch. Client code imports the data model
+ * would start an ~9-request fetch. Client code imports the data model
  * from `@/lib/framework-ranking` instead.
  */
 
@@ -58,7 +58,7 @@ const REQUEST_HEADERS = {
 
 const GROUP_LABELS: Record<FrameworkCategory, string> = {
   web: "Web frameworks",
-  micro: "Micro & RPC frameworks",
+  rpc: "RPC frameworks",
 }
 
 /**
@@ -109,7 +109,10 @@ async function fetchImportedBy(importPath: string): Promise<number> {
     }
 
     const total = data.importedBy?.total
-    if (typeof total !== "number") {
+    // pkg.go.dev reports -1 when it has no computed total for a package
+    // (imported-by counts are filled in asynchronously). Rendering a
+    // negative number would be worse than failing the build.
+    if (typeof total !== "number" || total < 0) {
       throw new Error(
         `Unexpected pkg.go.dev response: missing importedBy.total (${importPath})`
       )

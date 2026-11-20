@@ -12,7 +12,7 @@ const data = loadFrameworkRankings()
 const { meta, groups } = data
 
 const description =
-  `Ranking of Go web and microservice frameworks by pkg.go.dev imported-by ` +
+  `Ranking of Go web and RPC frameworks by pkg.go.dev imported-by ` +
   `counts — how many packages import each framework's canonical package. ` +
   `A cumulative snapshot as of ${formatDate(meta.generatedAt)}, rebuilt daily.`
 
@@ -86,16 +86,16 @@ const base = import.meta.env.BASE_URL
     </div>
   </section>
 
-  <section id="micro" class="scroll-mt-24 border-t border-border">
+  <section id="rpc" class="scroll-mt-24 border-t border-border">
     <div class="mx-auto w-full max-w-6xl px-6 py-20 md:py-28">
       <SectionHeading
         index="02"
-        title={groups.micro.label}
-        aside={`${groups.micro.ranked.length} frameworks · ${formatFull(groups.micro.total)} importers`}
-        description="RPC and microservice toolkits for systems that talk service-to-service — transport, codegen, and governance bundled in. Share compares each framework's imported-by count against this group's total."
+        title={groups.rpc.label}
+        aside={`${groups.rpc.ranked.length} frameworks · ${formatFull(groups.rpc.total)} importers`}
+        description="RPC frameworks for service-to-service communication — interface definitions, code generation, and transport. Share compares each framework's imported-by count against this group's total."
       />
       <div class="border border-border">
-        <FrameworkTable group={groups.micro} />
+        <FrameworkTable group={groups.rpc} />
       </div>
     </div>
   </section>

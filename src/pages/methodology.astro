@@ -204,15 +204,16 @@ const base = import.meta.env.BASE_URL
         </h2>
         <p class="mt-5 leading-relaxed text-muted-foreground">
           The <code class="font-serif">/go/</code> ranking covers a hand-curated
-          catalog of 11 Go web &amp; microservice frameworks, measured from a
-          different source: pkg.go.dev's official v1 API. One keyless request
-          per framework —{" "}
+          catalog of 9 Go frameworks — five web frameworks (Gin, Echo, Fiber,
+          GoFrame, Hertz) and four RPC frameworks (gRPC-Go, Thrift, Dubbo,
+          Kitex) — measured from a different source: pkg.go.dev's official v1
+          API. One keyless request per framework —{" "}
           <code class="break-all font-serif text-sm">
             {"GET https://pkg.go.dev/v1/imported-by/{package-path}"}
           </code>{" "}
           — returns the number of packages in the public Go module universe that
           import it directly. As of Nov 2026, for example, gRPC-Go is imported
-          by 270,134 packages and gin by 191,418. A full refresh is ~11 requests
+          by 270,134 packages and Gin by 191,418. A full refresh is ~9 requests
           paced at one per second, fetched inside{" "}
           <code class="font-serif">astro build</code> by{" "}
           <code class="font-serif">src/lib/pkgsite.ts</code> under the same
@@ -231,12 +232,6 @@ const base = import.meta.env.BASE_URL
             </code>
           </li>
           <li>
-            <strong class="text-foreground">Hertz</strong> —{" "}
-            <code class="break-all font-serif text-sm">
-              github.com/cloudwego/hertz/pkg/app
-            </code>
-          </li>
-          <li>
             <strong class="text-foreground">Echo</strong> —{" "}
             <code class="break-all font-serif text-sm">
               github.com/labstack/echo/v4
@@ -249,15 +244,15 @@ const base = import.meta.env.BASE_URL
             </code>
           </li>
           <li>
-            <strong class="text-foreground">Chi</strong> —{" "}
-            <code class="break-all font-serif text-sm">
-              github.com/go-chi/chi/v5
-            </code>
-          </li>
-          <li>
             <strong class="text-foreground">GoFrame</strong> —{" "}
             <code class="break-all font-serif text-sm">
               github.com/gogf/gf/v2/frame/g
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">Hertz</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/cloudwego/hertz/pkg/app
             </code>
           </li>
           <li>
@@ -267,27 +262,21 @@ const base = import.meta.env.BASE_URL
             </code>
           </li>
           <li>
+            <strong class="text-foreground">Thrift</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/apache/thrift/lib/go/thrift
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">Dubbo</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              dubbo.apache.org/dubbo-go/v3
+            </code>
+          </li>
+          <li>
             <strong class="text-foreground">Kitex</strong> —{" "}
             <code class="break-all font-serif text-sm">
               github.com/cloudwego/kitex/server
-            </code>
-          </li>
-          <li>
-            <strong class="text-foreground">Kratos</strong> —{" "}
-            <code class="break-all font-serif text-sm">
-              github.com/go-kratos/kratos/v2
-            </code>
-          </li>
-          <li>
-            <strong class="text-foreground">go-zero</strong> —{" "}
-            <code class="break-all font-serif text-sm">
-              github.com/zeromicro/go-zero/zrpc
-            </code>
-          </li>
-          <li>
-            <strong class="text-foreground">Go-Micro</strong> —{" "}
-            <code class="break-all font-serif text-sm">
-              github.com/asim/go-micro/v3
             </code>
           </li>
         </ul>
@@ -330,9 +319,13 @@ const base = import.meta.env.BASE_URL
           </li>
           <li>
             One canonical path can undercount a multi-package framework.
-            go-zero's <code class="font-serif">rest</code> package adds ~962
-            importers on top of <code class="font-serif">zrpc</code>'s 2,671 —
-            but summing both would double-count every package that imports each.
+            Dubbo-go is counted at its root package because that is what its
+            quickstart imports; code that only imports a subpackage such as{" "}
+            <code class="break-all font-serif text-sm">
+              dubbo.apache.org/dubbo-go/v3/config
+            </code>{" "}
+            is not folded in — summing subpackages would double-count every
+            package that imports several of them.
           </li>
           <li>
             pkg.go.dev publishes no per-day history of importer counts, so this
