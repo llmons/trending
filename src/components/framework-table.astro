@@ -1,0 +1,101 @@
+---
+import { RiExternalLinkLine } from "@remixicon/react"
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import type { FrameworkGroup } from "@/lib/framework-ranking"
+import { formatFull, formatPercent } from "@/lib/format"
+import { pkgGoDevUrl } from "@/lib/pkgsite"
+import { cn } from "@/lib/utils"
+
+interface Props {
+  group: FrameworkGroup
+}
+
+const { group } = Astro.props
+---
+
+<Table className="min-w-[720px]">
+  <TableHeader>
+    <TableRow className="border-border">
+      <TableHead className="w-16">№</TableHead>
+      <TableHead>Framework</TableHead>
+      <TableHead>Canonical package</TableHead>
+      <TableHead className="text-right">Importers</TableHead>
+      <TableHead className="w-56">Share of the group</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {group.ranked.map((framework) => {
+      const share = group.total > 0 ? framework.importers / group.total : 0
+      return (
+        <TableRow className="group/row border-border/60">
+          <TableCell
+            className={cn(
+              "font-serif text-lg tabular-nums transition-colors group-hover/row:text-viz-accent",
+              framework.rank <= 3 ? "text-viz-accent" : "text-muted-foreground"
+            )}
+          >
+            {String(framework.rank).padStart(2, "0")}
+          </TableCell>
+          <TableCell>
+            <span class="flex items-center gap-3">
+              <span
+                aria-hidden
+                class="size-2.5 shrink-0 rounded-full"
+                style={`background-color: ${framework.color}`}
+              />
+              <a
+                href={framework.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 font-heading text-sm font-semibold tracking-wider uppercase transition-colors hover:text-foreground"
+              >
+                {framework.name}
+                <RiExternalLinkLine className="size-3.5 text-muted-foreground" />
+              </a>
+            </span>
+          </TableCell>
+          <TableCell>
+            <a
+              href={pkgGoDevUrl(framework.importPath)}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {framework.importPath}
+            </a>
+          </TableCell>
+          <TableCell className="text-right font-serif text-base tabular-nums">
+            {formatFull(framework.importers)}
+          </TableCell>
+          <TableCell>
+            <div class="flex items-center gap-3">
+              <div class="h-1.5 min-w-12 grow bg-muted">
+                <div
+                  class="h-full bg-viz-accent opacity-80 transition-opacity group-hover/row:opacity-100"
+                  style={`width: ${Math.max(share * 100, 1.5)}%`}
+                />
+              </div>
+              <span class="w-16 text-right font-serif text-sm text-muted-foreground tabular-nums">
+                {formatPercent(share)}
+              </span>
+            </div>
+          </TableCell>
+        </TableRow>
+      )
+    })}
+  </TableBody>
+  <TableCaption>
+    Importers = packages importing the framework's canonical package, per
+    pkg.go.dev. Share = each framework's percentage of the "{group.label}" group
+    total.
+  </TableCaption>
+</Table>

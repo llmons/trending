@@ -1,4 +1,6 @@
 ---
+import { RiArrowRightLine } from "@remixicon/react"
+
 import CategoryBreakdown from "@/components/category-breakdown.astro"
 import Concentration from "@/components/concentration.astro"
 import Hero from "@/components/hero.astro"
@@ -7,6 +9,13 @@ import QualityLadder from "@/components/quality-ladder.astro"
 import RankingSection from "@/components/ranking-section"
 import SectionHeading from "@/components/section-heading.astro"
 import Ticker from "@/components/ticker.astro"
+import { buttonVariants } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card"
 import WeightedRanking from "@/components/weighted-ranking.astro"
 import Layout from "@/layouts/main.astro"
 import { loadRankings } from "@/lib/data"
@@ -14,6 +23,7 @@ import { formatDate } from "@/lib/format"
 
 const data = loadRankings()
 const { meta, tiers } = data
+const base = import.meta.env.BASE_URL
 
 const top3 = tiers.ge2.ranked.slice(0, 3)
 const top3Share = top3.reduce((sum, language) => sum + language.share, 0)
@@ -21,16 +31,22 @@ const top10Share = tiers.ge2.ranked
   .slice(0, 10)
   .reduce((sum, language) => sum + language.share, 0)
 
-const description =
+const languageDescription =
   `Ranking of programming languages by the number of new GitHub repositories ` +
   `created between ${formatDate(meta.window.from)} and ${formatDate(meta.window.to)}, ` +
   `with inclusive star tiers at 2, 20, and 100 stars. Updated daily from the public GitHub search API.`
 
+const description =
+  `Ranking of mainstream programming languages by new GitHub repositories created ` +
+  `between ${formatDate(meta.window.from)} and ${formatDate(meta.window.to)} ` +
+  `(inclusive star tiers at 2, 20, and 100 stars), plus Go web and microservice frameworks ` +
+  `ranked by pkg.go.dev imported-by counts. Rebuilt daily.`
+
 const datasetSchema = {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  name: "lang.trending — programming language ranking",
-  description,
+  name: "trending — programming language ranking",
+  description: languageDescription,
   temporalCoverage: `${meta.window.from}/${meta.window.to}`,
   dateCreated: meta.generatedAt,
   isAccessibleForFree: true,
@@ -38,7 +54,7 @@ const datasetSchema = {
 ---
 
 <Layout
-  title="lang.trending — what the world is building"
+  title="trending — programming languages ranked by GitHub activity"
   description={description}
 >
   <Hero data={data} />
@@ -80,6 +96,26 @@ const datasetSchema = {
         />
         <MethodologyCard />
       </div>
+    </div>
+  </section>
+
+  <section class="border-t border-border">
+    <div class="mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
+      <Card>
+        <CardContent className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div>
+            <CardTitle>More rankings</CardTitle>
+            <CardDescription className="mt-2 max-w-xl">
+              Go web & microservice frameworks, ranked by how many packages
+              import them — live on pkg.go.dev data.
+            </CardDescription>
+          </div>
+          <a href={`${base}go/`} class={buttonVariants({ variant: "outline" })}>
+            Go frameworks
+            <RiArrowRightLine data-icon="inline-end" />
+          </a>
+        </CardContent>
+      </Card>
     </div>
   </section>
 

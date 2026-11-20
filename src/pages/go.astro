@@ -1,0 +1,108 @@
+---
+import { RiExternalLinkLine } from "@remixicon/react"
+
+import FrameworkTable from "@/components/framework-table.astro"
+import SectionHeading from "@/components/section-heading.astro"
+import { Badge } from "@/components/ui/badge"
+import Layout from "@/layouts/main.astro"
+import { formatDate, formatFull } from "@/lib/format"
+import { loadFrameworkRankings } from "@/lib/pkgsite"
+
+const data = loadFrameworkRankings()
+const { meta, groups } = data
+
+const description =
+  `Ranking of Go web and microservice frameworks by pkg.go.dev imported-by ` +
+  `counts — how many packages import each framework's canonical package. ` +
+  `A cumulative snapshot as of ${formatDate(meta.generatedAt)}, rebuilt daily.`
+
+const datasetSchema = {
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  name: "trending — Go framework ranking",
+  description,
+  dateCreated: meta.generatedAt,
+  isAccessibleForFree: true,
+}
+
+const base = import.meta.env.BASE_URL
+---
+
+<Layout
+  title="trending — Go frameworks ranked by pkg.go.dev imports"
+  description={description}
+>
+  <section class="border-b border-border">
+    <div class="mx-auto w-full max-w-6xl px-6 pt-16 pb-14 md:pt-20 md:pb-16">
+      <Badge>pkg.go.dev imported-by</Badge>
+      <h1 class="mt-8 max-w-3xl text-4xl leading-[1.05] font-medium tracking-tight text-balance sm:text-5xl md:text-6xl">
+        Go frameworks, ranked by who{" "}
+        <em class="text-viz-accent italic">imports</em>
+        them.
+      </h1>
+      <p class="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+        The metric is pkg.go.dev's imported-by count: how many packages import
+        each framework's canonical package. Unlike the language ranking's
+        rolling one-year window, this is a cumulative snapshot of the whole
+        ecosystem as it stands on the build date.
+      </p>
+      <div class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+        <span>{meta.frameworksTracked} frameworks tracked</span>
+        <span aria-hidden>·</span>
+        <span>Generated {formatDate(meta.generatedAt)}</span>
+        <span aria-hidden>·</span>
+        <a
+          class="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+          href="https://pkg.go.dev"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          pkg.go.dev
+          <RiExternalLinkLine className="size-3.5" />
+        </a>
+        <span aria-hidden>·</span>
+        <a
+          class="transition-colors hover:text-foreground"
+          href={`${base}methodology/#go-frameworks`}
+        >
+          Full methodology
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="web"
+    class="mx-auto w-full max-w-6xl scroll-mt-24 px-6 py-20 md:py-28"
+  >
+    <SectionHeading
+      index="01"
+      title={groups.web.label}
+      aside={`${groups.web.ranked.length} frameworks · ${formatFull(groups.web.total)} importers`}
+      description="HTTP routers and full-stack frameworks for services and APIs — the layer most Go servers are built on. Share compares each framework's imported-by count against this group's total."
+    />
+    <div class="border border-border">
+      <FrameworkTable group={groups.web} />
+    </div>
+  </section>
+
+  <section id="micro" class="scroll-mt-24 border-t border-border">
+    <div class="mx-auto w-full max-w-6xl px-6 py-20 md:py-28">
+      <SectionHeading
+        index="02"
+        title={groups.micro.label}
+        aside={`${groups.micro.ranked.length} frameworks · ${formatFull(groups.micro.total)} importers`}
+        description="RPC and microservice toolkits for systems that talk service-to-service — transport, codegen, and governance bundled in. Share compares each framework's imported-by count against this group's total."
+      />
+      <div class="border border-border">
+        <FrameworkTable group={groups.micro} />
+      </div>
+    </div>
+  </section>
+
+  <script
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(datasetSchema)}
+  />
+</Layout>
