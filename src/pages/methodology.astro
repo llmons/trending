@@ -20,8 +20,8 @@ const base = import.meta.env.BASE_URL
 ---
 
 <Layout
-  title="Methodology — lang.trending"
-  description="How lang.trending measures programming language popularity: GitHub search queries, a rolling one-year window, and a throttled pipeline that authenticates in CI via the auto-injected GITHUB_TOKEN."
+  title="Methodology — trending"
+  description="How trending measures programming language popularity: GitHub search queries, a rolling one-year window, and a throttled pipeline that authenticates in CI via the auto-injected GITHUB_TOKEN."
 >
   <section class="mx-auto w-full max-w-3xl px-6 pt-16 pb-24 md:pt-20">
     <a href={base} class={buttonVariants({ variant: "ghost", size: "sm" })}>
@@ -194,6 +194,159 @@ const base = import.meta.env.BASE_URL
           contributes nothing at all: the harder a repository was to earn, the
           more it counts. It is pure arithmetic on the same{" "}
           {meta.languagesTracked * 3} counts — no extra API requests.
+        </p>
+      </div>
+
+      <div id="go-frameworks">
+        <h2 class={sectionHeadingClass}>
+          <span class="text-viz-accent tabular-nums">08</span> Go frameworks —
+          imported-by
+        </h2>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          The <code class="font-serif">/go/</code> ranking covers a hand-curated
+          catalog of 11 Go web &amp; microservice frameworks, measured from a
+          different source: pkg.go.dev's official v1 API. One keyless request
+          per framework —{" "}
+          <code class="break-all font-serif text-sm">
+            {"GET https://pkg.go.dev/v1/imported-by/{package-path}"}
+          </code>{" "}
+          — returns the number of packages in the public Go module universe that
+          import it directly. As of Nov 2026, for example, gRPC-Go is imported
+          by 270,134 packages and gin by 191,418. A full refresh is ~11 requests
+          paced at one per second, fetched inside{" "}
+          <code class="font-serif">astro build</code> by{" "}
+          <code class="font-serif">src/lib/pkgsite.ts</code> under the same
+          all-or-nothing rule as the language pipeline: a count that ultimately
+          fails fails the build.
+        </p>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          Each framework is counted at exactly one canonical package — the
+          import typical user code makes per the framework's own quickstart:
+        </p>
+        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+          <li>
+            <strong class="text-foreground">gin</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/gin-gonic/gin
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">Hertz</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/cloudwego/hertz/pkg/app
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">Echo</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/labstack/echo/v4
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">Fiber</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/gofiber/fiber/v2
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">Chi</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/go-chi/chi/v5
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">GoFrame</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/gogf/gf/v2/frame/g
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">gRPC-Go</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              google.golang.org/grpc
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">Kitex</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/cloudwego/kitex/server
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">Kratos</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/go-kratos/kratos/v2
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">go-zero</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/zeromicro/go-zero/zrpc
+            </code>
+          </li>
+          <li>
+            <strong class="text-foreground">Go-Micro</strong> —{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/asim/go-micro/v3
+            </code>
+          </li>
+        </ul>
+        <p class="mt-4 leading-relaxed text-muted-foreground">
+          Frameworks with several plausible entry points are deliberately
+          counted at a single canonical path — one path per framework keeps
+          every count on the same basis, comparability over completeness.
+        </p>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          The semantics differ from everything above: this is a{" "}
+          <em>cumulative snapshot</em> taken at build time, not the rolling
+          one-year window used for languages. Imported-by counts adoption{" "}
+          <strong class="text-foreground">stock</strong> — everything that
+          imports a framework today — while repository creation counts{" "}
+          <strong class="text-foreground">flow</strong>.
+        </p>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          The number itself is produced by pkg.go.dev (the pkgsite project): it
+          indexes every module version as proxy.golang.org caches it, parses Go
+          imports out of the module zips, and maintains per-package importer
+          counts. We just read the total.
+        </p>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          A few caveats, in the same spirit as section 06:
+        </p>
+        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+          <li>
+            Private, vendored, and internal-only code is invisible — only
+            modules published through the public proxy/index count, so a
+            framework imported heavily inside company monorepos looks smaller
+            than it is.
+          </li>
+          <li>
+            Code generators inflate the RPC frameworks: services generated into{" "}
+            <code class="font-serif">kitex_gen</code> still import{" "}
+            <code class="break-all font-serif text-sm">
+              github.com/cloudwego/kitex/server
+            </code>{" "}
+            — one generated service can contribute many importing packages.
+          </li>
+          <li>
+            One canonical path can undercount a multi-package framework.
+            go-zero's <code class="font-serif">rest</code> package adds ~962
+            importers on top of <code class="font-serif">zrpc</code>'s 2,671 —
+            but summing both would double-count every package that imports each.
+          </li>
+          <li>
+            pkg.go.dev publishes no per-day history of importer counts, so this
+            section has no trend or velocity — only the current snapshot,
+            rebuilt daily.
+          </li>
+        </ul>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          Why importers, and not stars or downloads? GitHub stars measure
+          sentiment, not usage — a starred framework may never be imported. And
+          Go has no public download counter: proxy.golang.org and goproxy.cn
+          expose no per-module download-count API, and deps.dev carries no
+          download metrics. Imported-by is the closest official, keyless,
+          programmatic adoption signal that exists.
         </p>
       </div>
     </div>

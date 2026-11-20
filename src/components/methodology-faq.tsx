@@ -44,6 +44,16 @@ const FAQS = [
     answer:
       "Unauthenticated search allows 10 requests per minute per IP — and GitHub Actions shares runner IPs across many repositories, so that pool can be exhausted by other people's workflows. The daily CI build therefore authenticates with the automatically injected GITHUB_TOKEN, which grants a dedicated 30 requests per minute. The fetcher paces itself to exactly the ceiling of its mode — one request every 6 seconds unauthenticated, 2 seconds authenticated — with automatic retries after rate-limit windows and whole-pipeline recovery rounds for stragglers. If a fetch still fails, the build fails too — the site has no data to fall back on — and the previously deployed site simply stays online until the next successful build.",
   },
+  {
+    question: "How are the Go framework rankings measured?",
+    answer:
+      "Each framework is counted at one canonical package — the import its quickstart tells you to make — using pkg.go.dev's official imported-by API, which returns how many packages in the public Go module universe import it directly. Unlike the language ranking's rolling one-year window, this is a cumulative snapshot rebuilt daily, measuring adoption stock rather than new activity. The fetch is ~11 keyless requests paced at one per second, and a failed count fails the build.",
+  },
+  {
+    question: "Why not GitHub stars or download counts for frameworks?",
+    answer:
+      "GitHub stars measure sentiment, not usage — a starred framework may never be imported. Go also has no public download counter: proxy.golang.org and goproxy.cn expose no per-module download-count API, and deps.dev carries no download metrics. Imported-by counts are the closest official, keyless, programmatic evidence of real adoption: packages that directly depend on the framework.",
+  },
 ]
 
 export default function MethodologyFaq() {
