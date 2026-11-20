@@ -3,7 +3,7 @@
 A daily-updated static site of rankings across tech-stack domains, rebuilt from live data every day:
 
 - **Programming languages** — ranked by the number of new public GitHub repositories created within a rolling one-year window — across three inclusive star tiers: **≥2 stars**, **≥20 stars**, **≥100 stars** (repositories below 2 stars are deliberately out of scope) — plus a weighted composite that folds the three tiers into one score (weights 1×/2×/4×, derived from the same counts).
-- **Go frameworks** — a new section live at `/go/`: Go web & microservice frameworks ranked by their pkg.go.dev imported-by counts.
+- **Go frameworks** — a new section live at `/go/`: Go web & RPC frameworks ranked by their pkg.go.dev imported-by counts.
 
 ## How it works
 
@@ -11,7 +11,7 @@ Every build is a fresh measurement:
 
 1. `astro build` computes the window — _today minus 365 days → today_ (UTC), never hardcoded.
 2. It queries the public GitHub search API once per language per star tier: 39 mainstream languages × 3 tiers = **117 requests**, paced at exactly the rate limit of the current mode — the dedicated 30 requests/minute with the CI's auto-injected `GITHUB_TOKEN` (~4.5 minutes), or the shared unauthenticated pool of 10 requests/minute (~12 minutes).
-3. It fetches each curated Go framework's pkg.go.dev v1 imported-by total (11 frameworks, keyless, 1s pacing) — giving ~117 GitHub requests + ~11 pkg.go.dev requests per build.
+3. It fetches each curated Go framework's pkg.go.dev v1 imported-by total (9 frameworks, keyless, 1s pacing) — giving ~117 GitHub requests + ~9 pkg.go.dev requests per build.
 4. The counts are baked into fully static pages — no client-side data fetching, no committed data files.
 
 Forks and mirrors are excluded from every query. The language catalog is hand-curated to common, mainstream languages only (see `src/lib/languages.ts`); niche and esoteric languages are intentionally out of scope. Rate-limit responses trigger retries with exponential backoff and whole-pipeline recovery rounds.
@@ -27,6 +27,8 @@ pnpm preview    # serves the built site locally
 ```
 
 `pnpm dev` also works, but re-fetches data once per dev-server session, so the first page request is slow.
+
+For a fast local look, `pnpm build:mock` / `pnpm dev:mock` replace only the GitHub counts with a synthetic fixture (seconds instead of ~12 minutes). pkg.go.dev counts stay live, and the output is marked `Sample data` with `noindex` — never deploy it.
 
 Other checks:
 
