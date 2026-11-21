@@ -1,13 +1,6 @@
 ---
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import type { CategoryShare } from "@/lib/tiers"
 import { formatPercent } from "@/lib/format"
+import type { CategoryShare } from "@/lib/tiers"
 
 interface Props {
   categories: CategoryShare[]
@@ -16,54 +9,48 @@ interface Props {
 const { categories } = Astro.props
 
 // Static class names so Tailwind can see them (never built dynamically).
-const SERIES_CLASSES = [
-  "bg-viz-series-1",
-  "bg-viz-series-2",
-  "bg-viz-series-3",
-  "bg-viz-series-4",
-]
+const SERIES_CLASSES = ["bg-viz-1", "bg-viz-2", "bg-viz-3", "bg-viz-4"]
 
 const barLabel = categories
   .map((category) => `${category.label} ${formatPercent(category.share)}`)
   .join(", ")
 ---
 
-<Card className="gap-6">
-  <CardHeader>
-    <CardTitle>The center of gravity</CardTitle>
-    <CardDescription>
-      Where the year's new repositories (≥2 stars) landed, by language family.
-    </CardDescription>
-  </CardHeader>
-  <CardContent className="space-y-6">
-    <div
-      class="flex h-3 w-full gap-0.5"
-      role="img"
-      aria-label={`Share of new repositories by language family: ${barLabel}`}
-    >
-      {categories.map((category, index) => (
-        <div
-          class={SERIES_CLASSES[index] ?? SERIES_CLASSES[0]}
-          style={`width: ${Math.max(category.share * 100, 1)}%`}
-        ></div>
-      ))}
-    </div>
-    <ul class="space-y-2.5">
-      {categories.map((category, index) => (
-        <li class="flex items-center gap-3 text-sm">
-          <span
-            class={[
-              "size-2 shrink-0",
-              SERIES_CLASSES[index] ?? SERIES_CLASSES[0],
-            ].join(" ")}
-            aria-hidden="true"
-          ></span>
-          <span class="text-muted-foreground">{category.label}</span>
-          <span class="ml-auto font-serif tabular-nums">
-            {formatPercent(category.share)}
-          </span>
-        </li>
-      ))}
-    </ul>
-  </CardContent>
-</Card>
+<article class="breakdown md:col-span-7">
+  <p class="label">Composition</p>
+  <h3 class="mt-3 text-title font-semibold text-ink">
+    Share by language family
+  </h3>
+  <p class="mt-2 max-w-lg text-meta leading-relaxed text-ink-soft">
+    Where the year's new repositories (≥2 stars) landed once the catalog is
+    grouped into families.
+  </p>
+
+  <div
+    class="mt-7 flex h-2.5 w-full gap-[2px]"
+    role="img"
+    aria-label={`Share of new repositories by language family: ${barLabel}`}
+  >
+    {categories.map((category, index) => (
+      <div
+        class={SERIES_CLASSES[index] ?? SERIES_CLASSES[0]}
+        style={`width: ${Math.max(category.share * 100, 1)}%`}
+      />
+    ))}
+  </div>
+
+  <ul class="mt-6 space-y-3">
+    {categories.map((category, index) => (
+      <li class="grid grid-cols-[0.5rem_1fr_auto] items-center gap-3 border-b border-line-soft pb-3 last:border-0 last:pb-0">
+        <span
+          class:list={["size-2", SERIES_CLASSES[index] ?? SERIES_CLASSES[0]]}
+          aria-hidden="true"
+        />
+        <span class="text-[0.8125rem] text-ink-soft">{category.label}</span>
+        <span class="num text-[0.8125rem] text-ink">
+          {formatPercent(category.share)}
+        </span>
+      </li>
+    ))}
+  </ul>
+</article>

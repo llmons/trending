@@ -1,62 +1,40 @@
 ---
-import { RiArrowRightLine } from "@remixicon/react"
+import Icon from "@/components/icon.astro"
 
-import { buttonVariants } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 const base = import.meta.env.BASE_URL
+
+const steps = [
+  "Three queries per language — one per star tier — against the public GitHub search API, counting only repositories created inside the window.",
+  "Every request paced to the ceiling of its mode: 10 searches per minute unauthenticated, 30 with CI's injected GITHUB_TOKEN.",
+  "The window is computed at build time as today minus 365 days, then baked into static HTML. Nothing is fetched in the browser.",
+]
 ---
 
-<Card className="gap-6">
-  <CardHeader>
-    <CardTitle>How the numbers are gathered</CardTitle>
-    <CardDescription>
-      Three constraints keep this index honest and reproducible.
-    </CardDescription>
-  </CardHeader>
-  <CardContent className="space-y-6">
-    <ol class="space-y-5">
-      <li class="flex gap-4">
-        <span class="font-heading text-sm font-bold text-viz-accent tabular-nums">
-          01
+<article class="breakdown md:col-span-6">
+  <p class="label">Method</p>
+  <h3 class="mt-3 text-title font-semibold text-ink">
+    How each count is produced
+  </h3>
+  <p class="mt-2 text-meta leading-relaxed text-ink-soft">
+    One count per query, read straight from the API's total.
+  </p>
+
+  <ol class="mt-7 space-y-5">
+    {steps.map((step, index) => (
+      <li class="flex gap-3.5">
+        <span class="num mt-0.5 text-[0.6875rem] text-accent">
+          {String(index + 1).padStart(2, "0")}
         </span>
-        <p class="text-sm leading-relaxed text-muted-foreground">
-          Three queries per language — one per star tier — against the public
-          GitHub search API, counting only repositories created inside the
-          window.
-        </p>
+        <p class="text-[0.8125rem] leading-relaxed text-ink-soft">{step}</p>
       </li>
-      <li class="flex gap-4">
-        <span class="font-heading text-sm font-bold text-viz-accent tabular-nums">
-          02
-        </span>
-        <p class="text-sm leading-relaxed text-muted-foreground">
-          Every request is paced to exactly the ceiling of its mode — ten
-          searches per minute unauthenticated, thirty with the CI's
-          automatically injected GITHUB_TOKEN.
-        </p>
-      </li>
-      <li class="flex gap-4">
-        <span class="font-heading text-sm font-bold text-viz-accent tabular-nums">
-          03
-        </span>
-        <p class="text-sm leading-relaxed text-muted-foreground">
-          The window is recomputed at build time — always today minus one year,
-          never hardcoded — and the site ships as static files.
-        </p>
-      </li>
-    </ol>
-    <a
-      href={`${base}methodology`}
-      class={buttonVariants({ variant: "outline", size: "sm" })}
-    >
-      Read the full methodology
-      <RiArrowRightLine data-icon="inline-end" />
-    </a>
-  </CardContent>
-</Card>
+    ))}
+  </ol>
+
+  <a
+    href={`${base}methodology/`}
+    class="link-draw mt-6 inline-flex items-center gap-1.5 font-mono text-[0.6875rem] tracking-[0.12em] text-accent uppercase"
+  >
+    Full methodology
+    <Icon name="arrow-right" size={13} />
+  </a>
+</article>

@@ -1,11 +1,4 @@
 ---
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { formatPercent } from "@/lib/format"
 
 interface Props {
@@ -18,51 +11,42 @@ interface Props {
 const { top3Names, top3Share, top10Share, remaining } = Astro.props
 ---
 
-<Card className="gap-6">
-  <CardHeader>
-    <CardTitle>Concentration</CardTitle>
-    <CardDescription>
-      How much of the year's new code flows through the biggest languages.
-    </CardDescription>
-  </CardHeader>
-  <CardContent className="space-y-7">
-    <div class="space-y-2">
-      <div class="flex items-baseline justify-between gap-4">
-        <span class="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-          Top 3 — {top3Names.join(", ")}
-        </span>
-        <span class="font-serif text-lg tabular-nums">
-          {formatPercent(top3Share)}
-        </span>
-      </div>
-      <div class="h-2 bg-muted">
-        <div
-          class="h-full bg-viz-accent"
-          style={`width: ${top3Share * 100}%`}
-        ></div>
-      </div>
+<article class="breakdown md:col-span-6">
+  <p class="label">Concentration</p>
+  <h3 class="mt-3 text-title font-semibold text-ink">
+    How top-heavy the year was
+  </h3>
+  <p class="mt-2 text-meta leading-relaxed text-ink-soft">
+    Share of all new repositories (≥2 stars) held by the largest languages.
+  </p>
+
+  <dl class="mt-7 space-y-6">
+    <div>
+      <dt class="label text-ink-soft">Top 3 — {top3Names.join(", ")}</dt>
+      <dd class="num mt-2 text-[2.25rem] leading-none text-ink">
+        {formatPercent(top3Share)}
+      </dd>
+      <dd class="mt-2.5 h-[3px] overflow-hidden bg-panel-2">
+        <span class="bar" style={`--w:${(top3Share * 100).toFixed(2)}%`} />
+      </dd>
     </div>
 
-    <div class="space-y-2">
-      <div class="flex items-baseline justify-between gap-4">
-        <span class="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-          Top 10
-        </span>
-        <span class="font-serif text-lg tabular-nums">
-          {formatPercent(top10Share)}
-        </span>
-      </div>
-      <div class="h-2 bg-muted">
-        <div
-          class="h-full bg-viz-accent/70"
-          style={`width: ${top10Share * 100}%`}
-        ></div>
-      </div>
+    <div>
+      <dt class="label text-ink-soft">Top 10</dt>
+      <dd class="num mt-2 text-[2.25rem] leading-none text-ink">
+        {formatPercent(top10Share)}
+      </dd>
+      <dd class="mt-2.5 h-[3px] overflow-hidden bg-panel-2">
+        <span
+          class="bar"
+          style={`--w:${(top10Share * 100).toFixed(2)}%;--bar-color:var(--ink-faint)`}
+        />
+      </dd>
     </div>
+  </dl>
 
-    <p class="text-sm leading-relaxed text-muted-foreground">
-      The long tail is long: the remaining {remaining} tracked languages split
-      the rest of the year's new repositories between them.
-    </p>
-  </CardContent>
-</Card>
+  <p class="mt-6 border-t border-line-soft pt-4 text-[0.6875rem] leading-relaxed text-ink-faint">
+    The remaining {remaining} tracked languages split the rest of the year's new
+    repositories between them.
+  </p>
+</article>
