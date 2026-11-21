@@ -1,15 +1,15 @@
 ---
-import { RiExternalLinkLine } from "@remixicon/react"
-
 import FrameworkTable from "@/components/framework-table.astro"
+import Icon from "@/components/icon.astro"
 import SectionHeading from "@/components/section-heading.astro"
-import { Badge } from "@/components/ui/badge"
 import Layout from "@/layouts/main.astro"
 import { formatDate, formatFull } from "@/lib/format"
 import { loadFrameworkRankings } from "@/lib/pkgsite"
 
 const data = loadFrameworkRankings()
 const { meta, groups } = data
+const leader = data.ranked[0]
+const base = import.meta.env.BASE_URL
 
 const description =
   `Ranking of Go web and RPC frameworks by pkg.go.dev imported-by ` +
@@ -24,77 +24,110 @@ const datasetSchema = {
   dateCreated: meta.generatedAt,
   isAccessibleForFree: true,
 }
-
-const base = import.meta.env.BASE_URL
 ---
 
 <Layout
   title="trending — Go frameworks ranked by pkg.go.dev imports"
   description={description}
 >
-  <section class="border-b border-border">
-    <div class="mx-auto w-full max-w-6xl px-6 pt-16 pb-14 md:pt-20 md:pb-16">
-      <Badge>pkg.go.dev imported-by</Badge>
-      <h1 class="mt-8 max-w-3xl text-4xl leading-[1.05] font-medium tracking-tight text-balance sm:text-5xl md:text-6xl">
-        Go frameworks, ranked by who{" "}
-        <em class="text-viz-accent italic">imports</em>
-        them.
-      </h1>
-      <p class="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-        The metric is pkg.go.dev's imported-by count: how many packages import
-        each framework's canonical package. Unlike the language ranking's
-        rolling one-year window, this is a cumulative snapshot of the whole
-        ecosystem as it stands on the build date.
-      </p>
-      <div class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-        <span>{meta.frameworksTracked} frameworks tracked</span>
-        <span aria-hidden>·</span>
-        <span>Generated {formatDate(meta.generatedAt)}</span>
-        <span aria-hidden>·</span>
-        <a
-          class="inline-flex items-center gap-1 transition-colors hover:text-foreground"
-          href="https://pkg.go.dev"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          pkg.go.dev
-          <RiExternalLinkLine className="size-3.5" />
-        </a>
-        <span aria-hidden>·</span>
-        <a
-          class="transition-colors hover:text-foreground"
-          href={`${base}methodology/#go-frameworks`}
-        >
-          Full methodology
-        </a>
+  <section class="relative overflow-hidden border-b border-line">
+    <div
+      class="grid-field pointer-events-none absolute inset-0 -z-10"
+      aria-hidden="true"
+    ></div>
+
+    <div class="wrap py-14 md:py-20">
+      <div class="grid gap-10 lg:grid-cols-12">
+        <div class="lg:col-span-7">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span class="label text-accent">Index 04</span>
+            <span class="label">pkg.go.dev imported-by</span>
+            <span class="label">Generated {formatDate(meta.generatedAt)}</span>
+          </div>
+
+          <h1 class="mt-6 max-w-2xl text-headline font-semibold text-ink">
+            Go frameworks, ranked by imported-by count.
+          </h1>
+
+          <p class="mt-5 max-w-2xl text-lede text-ink-soft">
+            How many packages in the public Go module universe import each
+            framework's canonical package. A cumulative snapshot of adoption
+            stock taken at build time — not the rolling one-year window the
+            language ranking uses.
+          </p>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="#web" class="btn btn-line">
+              Web frameworks
+              <Icon name="arrow-down" size={13} />
+            </a>
+            <a href="#rpc" class="btn btn-line">
+              RPC frameworks
+              <Icon name="arrow-down" size={13} />
+            </a>
+          </div>
+        </div>
+
+        <aside class="self-start lg:col-span-5">
+          <dl class="grid grid-cols-2 gap-px border border-line bg-line">
+            <div class="bg-canvas p-5">
+              <dt class="label">Most imported</dt>
+              <dd class="num mt-4 text-[1.3125rem] leading-none text-ink">
+                {leader.name}
+              </dd>
+              <dd class="num mt-2 text-[0.75rem] text-ink-soft">
+                {formatFull(leader.importers)} importers
+              </dd>
+            </div>
+            <div class="bg-canvas p-5">
+              <dt class="label">Frameworks</dt>
+              <dd class="num mt-4 text-[1.3125rem] leading-none text-ink">
+                {meta.frameworksTracked}
+              </dd>
+              <dd class="mt-2 text-[0.75rem] text-ink-soft">
+                web and RPC, one canonical package each
+              </dd>
+            </div>
+          </dl>
+
+          <p class="mt-4 text-[0.6875rem] leading-relaxed text-ink-faint">
+            Counts come from the keyless pkg.go.dev v1 imported-by endpoint, one
+            request per framework, paced at one per second.{" "}
+            <a
+              class="link-draw text-ink-soft hover:text-ink"
+              href={`${base}methodology/#go-frameworks`}
+            >
+              Full methodology
+            </a>
+          </p>
+        </aside>
       </div>
     </div>
   </section>
 
-  <section
-    id="web"
-    class="mx-auto w-full max-w-6xl scroll-mt-24 px-6 py-20 md:py-28"
-  >
-    <SectionHeading
-      index="01"
-      title={groups.web.label}
-      aside={`${groups.web.ranked.length} frameworks · ${formatFull(groups.web.total)} importers`}
-      description="HTTP routers and full-stack frameworks for services and APIs — the layer most Go servers are built on. Share compares each framework's imported-by count against this group's total."
-    />
-    <div class="border border-border">
-      <FrameworkTable group={groups.web} />
+  <section id="web" class="scroll-mt-24">
+    <div class="wrap py-16 md:py-24">
+      <SectionHeading
+        index="01"
+        title={groups.web.label}
+        aside={`${groups.web.ranked.length} frameworks · ${formatFull(groups.web.total)} importers`}
+        description="HTTP routers and full-stack frameworks for services and APIs — the layer most Go servers are built on. Share compares each framework against this group's total."
+      />
+      <div class="border border-line p-4 sm:p-6">
+        <FrameworkTable group={groups.web} />
+      </div>
     </div>
   </section>
 
-  <section id="rpc" class="scroll-mt-24 border-t border-border">
-    <div class="mx-auto w-full max-w-6xl px-6 py-20 md:py-28">
+  <section id="rpc" class="scroll-mt-24 border-t border-line bg-panel">
+    <div class="wrap py-16 md:py-24">
       <SectionHeading
         index="02"
         title={groups.rpc.label}
         aside={`${groups.rpc.ranked.length} frameworks · ${formatFull(groups.rpc.total)} importers`}
-        description="RPC frameworks for service-to-service communication — interface definitions, code generation, and transport. Share compares each framework's imported-by count against this group's total."
+        description="RPC frameworks for service-to-service calls — interface definitions, code generation, and transport. Share compares each framework against this group's total."
       />
-      <div class="border border-border">
+      <div class="border border-line p-4 sm:p-6">
         <FrameworkTable group={groups.rpc} />
       </div>
     </div>

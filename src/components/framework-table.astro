@@ -1,19 +1,8 @@
 ---
-import { RiExternalLinkLine } from "@remixicon/react"
-
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import Icon from "@/components/icon.astro"
 import type { FrameworkGroup } from "@/lib/framework-ranking"
 import { formatFull, formatPercent } from "@/lib/format"
 import { pkgGoDevUrl } from "@/lib/pkgsite"
-import { cn } from "@/lib/utils"
 
 interface Props {
   group: FrameworkGroup
@@ -22,80 +11,90 @@ interface Props {
 const { group } = Astro.props
 ---
 
-<Table className="min-w-[720px]">
-  <TableHeader>
-    <TableRow className="border-border">
-      <TableHead className="w-16">№</TableHead>
-      <TableHead>Framework</TableHead>
-      <TableHead>Canonical package</TableHead>
-      <TableHead className="text-right">Importers</TableHead>
-      <TableHead className="w-56">Share of the group</TableHead>
-    </TableRow>
-  </TableHeader>
-  <TableBody>
-    {group.ranked.map((framework) => {
+<table class="dtable dtable--stack">
+  <thead>
+    <tr>
+      <th scope="col">№</th>
+      <th scope="col">Framework</th>
+      <th scope="col">Canonical package</th>
+      <th class="r" scope="col">
+        Importers
+      </th>
+      <th scope="col">Share of group</th>
+    </tr>
+  </thead>
+  <tbody>
+    {group.ranked.map((framework, index) => {
       const share = group.total > 0 ? framework.importers / group.total : 0
       return (
-        <TableRow className="group/row border-border/60">
-          <TableCell
-            className={cn(
-              "font-serif text-lg tabular-nums transition-colors group-hover/row:text-viz-accent",
-              framework.rank <= 3 ? "text-viz-accent" : "text-muted-foreground"
-            )}
-          >
-            {String(framework.rank).padStart(2, "0")}
-          </TableCell>
-          <TableCell>
-            <span class="flex items-center gap-3">
+        <tr>
+          <td data-label="Rank">
+            <span
+              class:list={[
+                "num text-[0.8125rem]",
+                framework.rank <= 3 ? "text-accent" : "text-ink-faint",
+              ]}
+            >
+              {String(framework.rank).padStart(2, "0")}
+            </span>
+          </td>
+          <td data-label="Framework">
+            <span class="flex items-center gap-2.5">
               <span
-                aria-hidden
-                class="size-2.5 shrink-0 rounded-full"
+                class="size-1.5 shrink-0"
                 style={`background-color: ${framework.color}`}
+                aria-hidden="true"
               />
               <a
                 href={framework.repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-1.5 font-heading text-sm font-semibold tracking-wider uppercase transition-colors hover:text-foreground"
+                class="group/link inline-flex items-center gap-1.5 text-[0.9375rem] font-medium text-ink"
               >
-                {framework.name}
-                <RiExternalLinkLine className="size-3.5 text-muted-foreground" />
+                <span class="link-draw">{framework.name}</span>
+                <Icon
+                  name="arrow-up-right"
+                  size={13}
+                  class="text-ink-faint transition-colors group-hover/link:text-accent"
+                />
               </a>
             </span>
-          </TableCell>
-          <TableCell>
+          </td>
+          <td data-label="Package">
             <a
               href={pkgGoDevUrl(framework.importPath)}
               target="_blank"
               rel="noopener noreferrer"
-              class="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
+              class="font-mono text-[0.75rem] text-ink-soft transition-colors hover:text-accent"
             >
               {framework.importPath}
             </a>
-          </TableCell>
-          <TableCell className="text-right font-serif text-base tabular-nums">
-            {formatFull(framework.importers)}
-          </TableCell>
-          <TableCell>
+          </td>
+          <td data-label="Importers" class="r">
+            <span class="num text-[0.875rem] text-ink">
+              {formatFull(framework.importers)}
+            </span>
+          </td>
+          <td data-label="Share">
             <div class="flex items-center gap-3">
-              <div class="h-1.5 min-w-12 grow bg-muted">
-                <div
-                  class="h-full bg-viz-accent opacity-80 transition-opacity group-hover/row:opacity-100"
-                  style={`width: ${Math.max(share * 100, 1.5)}%`}
+              <span class="h-[3px] min-w-10 flex-1 overflow-hidden bg-panel-2">
+                <span
+                  class="bar"
+                  style={`--w:${Math.max(share * 100, 1.2).toFixed(2)}%;--i:${index}`}
                 />
-              </div>
-              <span class="w-16 text-right font-serif text-sm text-muted-foreground tabular-nums">
+              </span>
+              <span class="num w-11 text-right text-[0.75rem] text-ink-faint">
                 {formatPercent(share)}
               </span>
             </div>
-          </TableCell>
-        </TableRow>
+          </td>
+        </tr>
       )
     })}
-  </TableBody>
-  <TableCaption>
-    Importers = packages importing the framework's canonical package, per
-    pkg.go.dev. Share = each framework's percentage of the "{group.label}" group
-    total.
-  </TableCaption>
-</Table>
+  </tbody>
+</table>
+
+<p class="mt-4 max-w-3xl text-meta leading-relaxed text-ink-faint">
+  Importers = packages that import the framework's canonical package, per
+  pkg.go.dev. Share compares each count against the "{group.label}" group total.
+</p>
