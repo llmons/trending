@@ -50,9 +50,14 @@ const FAQS = [
       "Each framework is counted at one canonical package — the import its quickstart tells you to make — using pkg.go.dev's official imported-by API, which returns how many packages in the public Go module universe import it directly. Unlike the language ranking's rolling one-year window, this is a cumulative snapshot rebuilt daily, measuring adoption stock rather than new activity. The fetch is ~9 keyless requests paced at one per second, and a failed count fails the build.",
   },
   {
-    question: "Why not GitHub stars or download counts for frameworks?",
+    question: "How are the JS framework rankings measured?",
     answer:
-      "GitHub stars measure sentiment, not usage — a starred framework may never be imported. Go also has no public download counter: proxy.golang.org and goproxy.cn expose no per-module download-count API, and deps.dev carries no download metrics. Imported-by counts are the closest official, keyless, programmatic evidence of real adoption: packages that directly depend on the framework.",
+      "Each of the five tracked full-stack meta-frameworks is counted at its own npm package — next, astro, @sveltejs/kit, nuxt, @solidjs/start — using the public npm downloads API. The number is installs over the registry's trailing 30 days, a snapshot rebuilt daily. The meta-framework is counted rather than the renderer on purpose: svelte and solid-js are pulled in transitively by tooling and other libraries, so counting them would measure the surrounding ecosystem and rank Solid roughly fifty times too high. Downloads are install events, not projects — CI re-installs and container layers all count. The fetch is five keyless requests paced at one per second, and a failed count fails the build.",
+  },
+  {
+    question: "Why not GitHub stars for frameworks?",
+    answer:
+      "GitHub stars measure sentiment, not usage — a starred framework may never be imported or installed. For Go the closest keyless adoption signal is pkg.go.dev imported-by, because Go has no public download counter: proxy.golang.org and goproxy.cn expose no per-module download-count API, and deps.dev carries no download metrics. For JS the registry does publish install totals, so the JS section uses those instead — with their own caveats. Neither section uses stars.",
   },
 ]
 

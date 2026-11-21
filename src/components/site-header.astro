@@ -17,7 +17,10 @@ const base = import.meta.env.BASE_URL
   <div class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-6 px-6">
     <Logo />
 
-    <nav class="hidden items-center gap-8 md:flex" aria-label="Primary">
+    <nav
+      class="hidden items-center gap-4 md:flex lg:gap-8"
+      aria-label="Primary"
+    >
       <a class={navLinkClass} href={`${base}#ranking`}>
         The ranking
       </a>
@@ -27,6 +30,9 @@ const base = import.meta.env.BASE_URL
       <a class={navLinkClass} href={`${base}go/`}>
         Go frameworks
       </a>
+      <a class={navLinkClass} href={`${base}js/`}>
+        JS frameworks
+      </a>
       <a class={navLinkClass} href={`${base}methodology`}>
         Methodology
       </a>
@@ -34,7 +40,7 @@ const base = import.meta.env.BASE_URL
 
     <div class="flex items-center gap-1">
       <a
-        class="hidden items-center gap-1.5 px-2 text-xs font-semibold tracking-widest uppercase text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+        class="hidden items-center gap-1.5 px-2 text-xs font-semibold tracking-widest uppercase text-muted-foreground transition-colors hover:text-foreground lg:inline-flex"
         href={sourceUrl}
         target="_blank"
         rel="noopener noreferrer"

@@ -1,0 +1,105 @@
+---
+import { RiExternalLinkLine } from "@remixicon/react"
+
+import JsFrameworkTable from "@/components/js-framework-table.astro"
+import SectionHeading from "@/components/section-heading.astro"
+import { Badge } from "@/components/ui/badge"
+import Layout from "@/layouts/main.astro"
+import { formatCompact, formatDate, formatFull } from "@/lib/format"
+import { loadJsFrameworkRankings } from "@/lib/npm"
+
+const data = loadJsFrameworkRankings()
+const { meta, ranked, total } = data
+
+const windowLabel = `${formatDate(meta.window.from)} → ${formatDate(meta.window.to)}`
+
+const description =
+  `Ranking of JS/TS full-stack meta-frameworks by npm downloads of their ` +
+  `meta-framework package over the trailing 30 days (${windowLabel}). ` +
+  `A snapshot rebuilt daily.`
+
+const datasetSchema = {
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  name: "trending — JS full-stack framework ranking",
+  description,
+  dateCreated: meta.generatedAt,
+  temporalCoverage: `${meta.window.from}/${meta.window.to}`,
+  isAccessibleForFree: true,
+}
+
+const base = import.meta.env.BASE_URL
+---
+
+<Layout
+  title="trending — JS full-stack frameworks ranked by npm downloads"
+  description={description}
+>
+  <section class="border-b border-border">
+    <div class="mx-auto w-full max-w-6xl px-6 pt-16 pb-14 md:pt-20 md:pb-16">
+      <Badge>npm registry downloads</Badge>
+      <h1 class="mt-8 max-w-3xl text-4xl leading-[1.05] font-medium tracking-tight text-balance sm:text-5xl md:text-6xl">
+        Full-stack JS frameworks, ranked by{" "}
+        <em class="text-viz-accent italic">installs</em>.
+      </h1>
+      <p class="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+        The metric is npm downloads: how many times each framework's own package
+        was installed over the trailing 30 days. Every entry is the
+        meta-framework, so the comparison stays like-for-like — Svelte is
+        counted at <code class="font-serif">@sveltejs/kit</code> and Solid at{" "}
+        <code class="font-serif">@solidjs/start</code>, not at their renderers.
+      </p>
+      <div class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+        <span>{meta.frameworksTracked} frameworks tracked</span>
+        <span aria-hidden>·</span>
+        <span>Window {windowLabel}</span>
+        <span aria-hidden>·</span>
+        <span>{formatCompact(total)} installs</span>
+        <span aria-hidden>·</span>
+        <a
+          class="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+          href="https://www.npmjs.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          npm
+          <RiExternalLinkLine className="size-3.5" />
+        </a>
+        <span aria-hidden>·</span>
+        <a
+          class="transition-colors hover:text-foreground"
+          href={`${base}methodology/#js-frameworks`}
+        >
+          Full methodology
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="frameworks"
+    class="mx-auto w-full max-w-6xl scroll-mt-24 px-6 py-20 md:py-28"
+  >
+    <SectionHeading
+      index="01"
+      title="Full-stack frameworks"
+      aside={`${ranked.length} frameworks · ${formatFull(total)} installs`}
+      description="Meta-frameworks that ship routing, rendering, and a server runtime in one package. Share compares each framework's installs against this group's total over the same 30-day window."
+    />
+    <div class="border border-border">
+      <JsFrameworkTable data={data} />
+    </div>
+    <p class="mt-6 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+      Downloads are install events, not projects: CI re-installs, container
+      layers, and transitive dependencies all count, and nothing is deduplicated
+      per machine. Read the ranking as adoption pressure across the ecosystem,
+      not as a headcount of applications.
+    </p>
+  </section>
+
+  <script
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(datasetSchema)}
+  />
+</Layout>

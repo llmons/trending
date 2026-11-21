@@ -21,7 +21,7 @@ const base = import.meta.env.BASE_URL
 
 <Layout
   title="Methodology — trending"
-  description="How trending measures programming language popularity: GitHub search queries, a rolling one-year window, and a throttled pipeline that authenticates in CI via the auto-injected GITHUB_TOKEN."
+  description="How trending measures popularity: GitHub search queries for languages over a rolling one-year window, pkg.go.dev imported-by counts for Go frameworks, and npm downloads for JS frameworks."
 >
   <section class="mx-auto w-full max-w-3xl px-6 pt-16 pb-24 md:pt-20">
     <a href={base} class={buttonVariants({ variant: "ghost", size: "sm" })}>
@@ -43,10 +43,11 @@ const base = import.meta.env.BASE_URL
     </h1>
 
     <p class="mt-6 leading-relaxed text-muted-foreground md:text-lg">
-      Every number on this site is a single count from the public GitHub search
-      API: the number of repositories created in a rolling one-year window,
-      tagged with a given language. There is no sampling, no estimation, and no
-      secret sauce — just a deliberately slow, carefully scoped pipeline.
+      Every number on this site is a single count read from a public API: the
+      number of repositories created in a rolling one-year window and tagged
+      with a given language. The framework sections use different sources and
+      say so where they appear. There is no sampling, no estimation, and no
+      secret sauce — just a deliberately scoped pipeline.
     </p>
 
     <div class="mt-16 space-y-16">
@@ -340,6 +341,114 @@ const base = import.meta.env.BASE_URL
           expose no per-module download-count API, and deps.dev carries no
           download metrics. Imported-by is the closest official, keyless,
           programmatic adoption signal that exists.
+        </p>
+      </div>
+
+      <div id="js-frameworks">
+        <h2 class={sectionHeadingClass}>
+          <span class="text-viz-accent tabular-nums">09</span> JS frameworks —
+          npm downloads
+        </h2>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          The <code class="font-serif">/js/</code> ranking covers a hand-curated
+          catalog of 5 full-stack JS/TS meta-frameworks — Next.js, Astro,
+          SvelteKit, Nuxt, and SolidStart — measured from the npm registry's
+          public downloads API. One keyless request per framework —{" "}
+          <code class="break-all font-serif text-sm">
+            {"GET https://api.npmjs.org/downloads/point/last-month/{package}"}
+          </code>{" "}
+          — returns the total number of installs of that package over the
+          trailing 30 days. The window is cut by the registry at the last
+          complete UTC day rather than snapped to a calendar month, and the page
+          always prints the exact dates the API reported. A full refresh is 5
+          requests paced at one per second, fetched inside{" "}
+          <code class="font-serif">astro build</code> by{" "}
+          <code class="font-serif">src/lib/npm.ts</code> under the same
+          all-or-nothing rule as the other pipelines: a count that ultimately
+          fails fails the build.
+        </p>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          Each framework is counted at exactly one package — its{" "}
+          <em>meta-framework</em> entry point, the thing a new project actually
+          installs:
+        </p>
+        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+          <li>
+            <strong class="text-foreground">Next.js</strong> —{" "}
+            <code class="break-all font-serif text-sm">next</code>
+          </li>
+          <li>
+            <strong class="text-foreground">Astro</strong> —{" "}
+            <code class="break-all font-serif text-sm">astro</code>
+          </li>
+          <li>
+            <strong class="text-foreground">SvelteKit</strong> —{" "}
+            <code class="break-all font-serif text-sm">@sveltejs/kit</code>
+          </li>
+          <li>
+            <strong class="text-foreground">Nuxt</strong> —{" "}
+            <code class="break-all font-serif text-sm">nuxt</code>
+          </li>
+          <li>
+            <strong class="text-foreground">SolidStart</strong> —{" "}
+            <code class="break-all font-serif text-sm">@solidjs/start</code>
+          </li>
+        </ul>
+        <p class="mt-4 leading-relaxed text-muted-foreground">
+          Why the meta-framework and not the renderer? Because{" "}
+          <code class="font-serif">svelte</code> and{" "}
+          <code class="font-serif">solid-js</code> are installed for reasons
+          that have nothing to do with building an app: they are pulled in
+          transitively by editor tooling, component libraries, and other
+          packages. In Nov 2026, <code class="font-serif">solid-js</code>{" "}
+          recorded roughly 49.5M monthly installs against 0.9M for{" "}
+          <code class="font-serif">@solidjs/start</code> — counting the renderer
+          would have ranked Solid second in the group instead of last, on a
+          number that measures something else entirely. One package per
+          framework keeps the comparison like-for-like.
+        </p>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          The metric is a <strong class="text-foreground">flow</strong>, and a
+          noisy one: npm counts install events, not projects or people. CI
+          re-installs, container layers, lockfile-free deployments, transitive
+          dependencies, and registry mirrors all inflate the totals, and nothing
+          is deduplicated per machine — a framework reinstalled once an hour by
+          a busy pipeline counts every hour. Read the ranking as adoption
+          pressure across the ecosystem, not as a headcount of applications, and
+          do not compare its totals with the language counts or the imported-by
+          counts: those measure different things on different bases.
+        </p>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          A few caveats, in the same spirit as sections 06 and 08:
+        </p>
+        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+          <li>
+            Scoped packages cannot be batched: the API's bulk lookup rejects
+            requests that mix <code class="font-serif">@scope/name</code>{" "}
+            packages, so every framework is fetched individually rather than in
+            one request.
+          </li>
+          <li>
+            No history is committed. The page shows only the current 30-day
+            snapshot; the same API's range endpoint could publish velocity, but
+            it is not used here, so there is no trend line or change figure.
+          </li>
+          <li>
+            A rename, split, or deprecation in the catalog breaks the series —
+            the catalog is hand-maintained, and the counts only stay comparable
+            while each framework keeps one canonical package.
+          </li>
+          <li>
+            The list is deliberately short and curated. React Router, Angular,
+            NestJS, and other full-stack toolkits are out of scope for now, for
+            the same reason the language catalog is curated: every addition has
+            to be defensible as a like-for-like comparison.
+          </li>
+        </ul>
+        <p class="mt-5 leading-relaxed text-muted-foreground">
+          Why downloads, and not stars? Stars record attention; downloads record
+          the build happening. Neither is a user count, but an install is at
+          least the artefact of somebody wiring the framework into a project.
         </p>
       </div>
     </div>

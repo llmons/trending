@@ -40,7 +40,8 @@ const description =
   `Ranking of mainstream programming languages by new GitHub repositories created ` +
   `between ${formatDate(meta.window.from)} and ${formatDate(meta.window.to)} ` +
   `(inclusive star tiers at 2, 20, and 100 stars), plus Go web and RPC frameworks ` +
-  `ranked by pkg.go.dev imported-by counts. Rebuilt daily.`
+  `ranked by pkg.go.dev imported-by counts and JS full-stack frameworks ranked by ` +
+  `npm downloads. Rebuilt daily.`
 
 const datasetSchema = {
   "@context": "https://schema.org",
@@ -61,8 +62,8 @@ const datasetSchema = {
   {meta.sample && (
     <div class="border-b border-border bg-muted/40">
       <p class="mx-auto w-full max-w-6xl px-6 py-2.5 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-        Sample data · GitHub counts are synthetic (local mock build) — Go
-        framework counts stay live
+        Sample data · GitHub counts are synthetic (local mock build) — framework
+        counts stay live
       </p>
     </div>
   )}
@@ -110,21 +111,48 @@ const datasetSchema = {
 
   <section class="border-t border-border">
     <div class="mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
-      <Card>
-        <CardContent className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div>
-            <CardTitle>More rankings</CardTitle>
-            <CardDescription className="mt-2 max-w-xl">
-              Go web & RPC frameworks, ranked by how many packages import them —
-              live on pkg.go.dev data.
-            </CardDescription>
-          </div>
-          <a href={`${base}go/`} class={buttonVariants({ variant: "outline" })}>
-            Go frameworks
-            <RiArrowRightLine data-icon="inline-end" />
-          </a>
-        </CardContent>
-      </Card>
+      <p class="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+        More rankings
+      </p>
+      <div class="mt-6 grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardContent className="flex h-full flex-col gap-6">
+            <div>
+              <CardTitle>Go frameworks</CardTitle>
+              <CardDescription className="mt-2">
+                Go web & RPC frameworks, ranked by how many packages import them
+                — live on pkg.go.dev data.
+              </CardDescription>
+            </div>
+            <a
+              href={`${base}go/`}
+              class={`${buttonVariants({ variant: "outline" })} mt-auto self-start`}
+            >
+              View ranking
+              <RiArrowRightLine data-icon="inline-end" />
+            </a>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex h-full flex-col gap-6">
+            <div>
+              <CardTitle>JS frameworks</CardTitle>
+              <CardDescription className="mt-2">
+                Full-stack JS frameworks, ranked by npm downloads over the
+                trailing 30 days — Next.js, Astro, SvelteKit, Nuxt, and
+                SolidStart.
+              </CardDescription>
+            </div>
+            <a
+              href={`${base}js/`}
+              class={`${buttonVariants({ variant: "outline" })} mt-auto self-start`}
+            >
+              View ranking
+              <RiArrowRightLine data-icon="inline-end" />
+            </a>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   </section>
 
