@@ -1,0 +1,165 @@
+---
+import { formatCompact, formatFull, formatPercent } from "@/lib/format"
+import {
+  STAR_TIERS,
+  TIER_WEIGHTS,
+  type Rankings,
+  type TierId,
+} from "@/lib/tiers"
+
+interface Props {
+  data: Rankings
+}
+
+const { data } = Astro.props
+
+const rows = data.weighted.ranked.slice(0, 10)
+const total = Math.max(data.weighted.total, 1)
+const leader = Math.max(rows[0]?.score ?? 1, 1)
+const top10Score = rows.reduce((sum, language) => sum + language.score, 0)
+
+// The three tier counts behind each composite score, keyed by language id.
+const reposByTier = Object.fromEntries(
+  STAR_TIERS.map((tier) => [
+    tier.id,
+    new Map(
+      data.tiers[tier.id].ranked.map((language) => [
+        language.id,
+        language.repos,
+      ])
+    ),
+  ])
+) as Record<TierId, Map<string, number>>
+
+const weights = STAR_TIERS.map(
+  (tier) => `${tier.label.replace("Stars ", "")} ×${TIER_WEIGHTS[tier.id]}`
+).join(" · ")
+---
+
+<table class="dtable wtable">
+  <caption class="sr-only">
+    Weighted ranking: the top ten languages by composite score across the three
+    star thresholds. Bars are scaled against the leader.
+  </caption>
+  <thead>
+    <tr>
+      <th class="col-rank" scope="col">
+        №
+      </th>
+      <th scope="col">Language</th>
+      {STAR_TIERS.map((tier, index) => (
+        <th
+          class="col-tier r hidden whitespace-nowrap md:table-cell"
+          scope="col"
+        >
+          {index === 0 ? tier.label : tier.label.replace("Stars ", "")}
+        </th>
+      ))}
+      <th class="col-score r" scope="col">
+        Weighted
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows.map((language, index) => (
+      <tr>
+        <td class="col-rank">
+          <span
+            class="num text-[0.75rem]"
+            class:list={[
+              language.rank === 1 ? "text-accent" : "text-ink-faint",
+            ]}
+          >
+            {String(language.rank).padStart(2, "0")}
+          </span>
+        </td>
+        <td class="col-name">
+          <span class="flex min-w-0 items-center gap-2.5">
+            <span
+              class="size-2 shrink-0"
+              style={`background-color: ${language.color}`}
+              aria-hidden="true"
+            />
+            <span class="truncate text-[1rem] font-medium text-ink">
+              {language.name}
+            </span>
+          </span>
+        </td>
+        {STAR_TIERS.map((tier) => (
+          <td class="col-tier r hidden md:table-cell">
+            <span class="num text-[0.875rem] text-ink-soft">
+              {formatFull(reposByTier[tier.id].get(language.id) ?? 0)}
+            </span>
+          </td>
+        ))}
+        <td class="col-score">
+          <span class="flex items-center justify-end gap-3">
+            <span class="track">
+              <span
+                class="bar"
+                style={`--w:${Math.max((language.score / leader) * 100, 2).toFixed(2)}%;--i:${index}`}
+              />
+            </span>
+            <span class="num text-[1.125rem] leading-none text-ink">
+              {formatCompact(language.score)}
+            </span>
+          </span>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+<p class="mt-5 flex flex-wrap items-baseline gap-x-4 gap-y-1 border-t border-line-soft pt-4 text-[0.6875rem] text-ink-faint">
+  <span class="font-mono tracking-[0.12em] uppercase">Weights</span>
+  <span class="num">{weights}</span>
+  <span class="num ml-auto">
+    Top 10 = {formatPercent(top10Score / total)} of the composite
+  </span>
+</p>
+
+<style>
+  .wtable {
+    table-layout: fixed;
+  }
+
+  .wtable tbody td {
+    padding-block: 0.85rem;
+  }
+
+  .col-rank {
+    width: 2.5rem;
+  }
+
+  .col-tier {
+    width: 6.5rem;
+  }
+
+  .col-score {
+    width: 12rem;
+  }
+
+  .track {
+    display: block;
+    width: 4rem;
+    height: 3px;
+    overflow: hidden;
+    background-color: var(--panel-2);
+  }
+
+  @media (min-width: 768px) {
+    .track {
+      width: 6rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .col-rank {
+      width: 2rem;
+    }
+
+    .col-score {
+      width: auto;
+    }
+  }
+</style>

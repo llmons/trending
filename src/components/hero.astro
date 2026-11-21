@@ -1,10 +1,8 @@
 ---
-import { RiArrowDownLine } from "@remixicon/react"
-
-import { Badge } from "@/components/ui/badge"
-import { buttonVariants } from "@/components/ui/button"
+import HeroField from "@/components/hero-field.svelte"
+import Icon from "@/components/icon.astro"
+import { formatCompact, formatDate, formatFull } from "@/lib/format"
 import type { Rankings } from "@/lib/tiers"
-import { formatCompact, formatDate } from "@/lib/format"
 
 interface Props {
   data: Rankings
@@ -12,113 +10,174 @@ interface Props {
 
 const { data } = Astro.props
 const { meta, tiers } = data
-
-// Days since GitHub's founding (2008-04-10) — a playful "issue number".
-const daysSinceStart = Math.floor(
-  (Date.now() - Date.UTC(2008, 3, 10)) / 86_400_000
-)
-
-const statClass = "border-l-2 border-border pl-4"
-const statLabelClass =
-  "text-[0.625rem] font-semibold tracking-widest uppercase text-muted-foreground"
-const statNoteClass = "mt-1 text-xs text-muted-foreground"
+const leaders = data.weighted.ranked.slice(0, 10)
 const base = import.meta.env.BASE_URL
+
+const stats = [
+  {
+    label: "New repositories",
+    value: tiers.ge2.total,
+    format: "compact" as const,
+    note: "≥ 2 stars, all tracked languages",
+  },
+  {
+    label: "Languages",
+    value: meta.languagesTracked,
+    format: "full" as const,
+    note: "Hand-curated, mainstream only",
+  },
+  {
+    label: "Repositories ≥ 100 stars",
+    value: tiers.ge100.total,
+    format: "compact" as const,
+    note: "Top threshold, same window",
+  },
+]
+
+const windowLabel = `${formatDate(meta.window.from)} → ${formatDate(meta.window.to)}`
 ---
 
-<section class="relative overflow-hidden border-b border-border">
-  <!-- decorative layers -->
+<section
+  data-hero
+  class="relative isolate overflow-hidden border-b border-line"
+>
   <div
-    class="pointer-events-none absolute inset-0 [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_at_top,black_20%,transparent_75%)]"
+    class="grid-field pointer-events-none absolute inset-0 -z-10"
     aria-hidden="true"
   ></div>
   <div
-    class="pointer-events-none absolute inset-0 bg-[radial-gradient(50rem_circle_at_85%_-20%,var(--viz-accent)/10%,transparent_60%)]"
+    class="hero-glow pointer-events-none absolute inset-0 -z-10"
     aria-hidden="true"
   ></div>
-  <p
-    class="pointer-events-none absolute -top-8 right-4 font-serif text-[12rem] leading-none font-bold text-transparent select-none [-webkit-text-stroke:1px_var(--viz-track)] md:-top-14 md:text-[20rem]"
-    aria-hidden="true"
-  >
-    365
-  </p>
+  <div class="absolute inset-0 -z-10">
+    <HeroField client:load />
+  </div>
 
-  <div class="relative mx-auto w-full max-w-6xl px-6 pt-16 pb-20 md:pt-24 md:pb-28">
-    <div class="flex flex-wrap items-center gap-3">
-      <Badge>Issue № {daysSinceStart.toLocaleString("en")}</Badge>
-      <Badge>
-        Live data
-        <span
-          class="ml-1.5 inline-block size-1.5 animate-pulse rounded-full bg-viz-accent"
-          aria-hidden="true"
-        ></span>
-      </Badge>
-      <Badge variant="secondary">
-        {formatDate(meta.window.from)} → {formatDate(meta.window.to)}
-      </Badge>
-    </div>
+  <div class="wrap relative">
+    <div class="grid min-h-[calc(100svh-3.5rem)] grid-cols-1 items-center gap-10 pt-10 pb-9 md:min-h-[calc(100svh-4rem)] lg:grid-cols-12 lg:gap-x-10 lg:pt-12">
+      <div class="lg:col-span-7">
+        <div
+          class="enter flex flex-wrap items-center gap-x-4 gap-y-1"
+          style="--d:0"
+        >
+          <span class="label text-accent">Daily index</span>
+          <span class="label">Generated {formatDate(meta.generatedAt)}</span>
+          <span class="label hidden sm:inline">Window {windowLabel}</span>
+        </div>
 
-    <h1 class="mt-10 max-w-4xl text-5xl leading-[0.98] font-medium tracking-tight text-balance sm:text-6xl md:text-7xl lg:text-8xl">
-      What the world is <em class="text-viz-accent italic">building</em>.
-    </h1>
+        <h1
+          class="enter mt-6 text-display font-semibold text-ink"
+          style="--d:1"
+        >
+          Programming languages, ranked by new repositories.
+        </h1>
 
-    <p class="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-      One year of public GitHub repositories, counted per programming language
-      and ranked every day. No credentials, no opinions — just the pace at which
-      each language is picked up.
-    </p>
-
-    <div class="mt-10 flex flex-wrap gap-4">
-      <a
-        href="#ranking"
-        class={buttonVariants({ variant: "default", size: "lg" })}
-      >
-        See the ranking
-        <RiArrowDownLine data-icon="inline-end" />
-      </a>
-      <a
-        href={`${base}methodology`}
-        class={buttonVariants({ variant: "outline", size: "lg" })}
-      >
-        How it's measured
-      </a>
-    </div>
-
-    <dl class="mt-16 grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4">
-      <div class={statClass}>
-        <dt class={statLabelClass}>New repositories</dt>
-        <dd class="mt-2 font-heading text-3xl font-bold tabular-nums md:text-4xl">
-          {formatCompact(tiers.ge2.total)}
-        </dd>
-        <p class={statNoteClass}>
-          with at least 2 stars, across tracked languages
+        <p class="enter mt-6 max-w-xl text-lede text-ink-soft" style="--d:2">
+          Public GitHub repositories created between{" "}
+          {formatDate(meta.window.from)} and {formatDate(meta.window.to)},
+          tagged by primary language, at least two stars. Counts are weighted by
+          the threshold they cleared — a repository that earned all three
+          contributes seven points.
         </p>
+
+        <div class="enter mt-9 flex flex-wrap gap-3" style="--d:3">
+          <a href="#ranking" class="btn btn-solid">
+            See the ranking
+            <Icon name="arrow-down" size={14} />
+          </a>
+          <a href={`${base}methodology/`} class="btn btn-line">
+            Read the methodology
+            <Icon name="arrow-right" size={14} />
+          </a>
+        </div>
       </div>
 
-      <div class={statClass}>
-        <dt class={statLabelClass}>Languages tracked</dt>
-        <dd class="mt-2 font-heading text-3xl font-bold tabular-nums md:text-4xl">
-          {meta.languagesTracked}
-        </dd>
-        <p class={statNoteClass}>mainstream, hand-curated</p>
-      </div>
+      <aside class="enter lg:col-span-5" style="--d:4">
+        <div class="border border-line bg-panel/80 p-5 backdrop-blur-sm sm:p-6">
+          <div class="flex items-baseline justify-between gap-4">
+            <h2 class="label text-ink">Weighted leaders</h2>
+            <span class="label">Top 10</span>
+          </div>
 
-      <div class={statClass}>
-        <dt class={statLabelClass}>The window</dt>
-        <dd class="mt-2 font-heading text-xl font-bold tabular-nums md:text-2xl">
-          {formatDate(meta.window.from)}
-          <span class="mx-1.5 font-serif text-muted-foreground">→</span>
-          {formatDate(meta.window.to)}
-        </dd>
-        <p class={statNoteClass}>rolling one year, computed at build time</p>
-      </div>
+          <ol class="mt-4 divide-y divide-line-soft border-t border-line-soft">
+            {leaders.map((language) => (
+              <li class="flex items-baseline gap-3 py-1.5">
+                <span class="num w-5 shrink-0 text-[0.6875rem] text-ink-faint">
+                  {String(language.rank).padStart(2, "0")}
+                </span>
+                <span
+                  class="size-1.5 shrink-0 translate-y-[-1px]"
+                  style={`background-color: ${language.color}`}
+                  aria-hidden="true"
+                />
+                <span class="truncate text-[0.875rem] font-medium text-ink">
+                  {language.name}
+                </span>
+              </li>
+            ))}
+          </ol>
 
-      <div class={statClass}>
-        <dt class={statLabelClass}>Repos with 100+ stars</dt>
-        <dd class="mt-2 font-heading text-3xl font-bold tabular-nums md:text-4xl">
-          {formatCompact(tiers.ge100.total)}
-        </dd>
-        <p class={statNoteClass}>of the year's new repositories</p>
-      </div>
-    </dl>
+          <div class="mt-6 flex items-baseline justify-between gap-3 border-t border-line-soft pt-4">
+            <span class="label">
+              {data.weighted.ranked.length} languages weighted
+            </span>
+            <a
+              href="#ranking"
+              class="link-draw font-mono text-[0.6875rem] tracking-[0.1em] text-accent uppercase"
+            >
+              Full ranking
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <dl
+        class="enter grid grid-cols-2 gap-y-8 border-t border-line pt-7 md:grid-cols-3 lg:col-span-12"
+        style="--d:5"
+      >
+        {stats.map((stat, index) => (
+          <div
+            class:list={["md:pl-6", index > 0 && "md:border-l md:border-line"]}
+          >
+            <dt class="label">{stat.label}</dt>
+            <dd class="num mt-3 text-[2rem] leading-none font-medium text-ink md:text-[2.375rem]">
+              <span
+                data-count={stat.value}
+                data-count-format={stat.format}
+                data-count-delay={index * 90}
+              >
+                {stat.format === "compact"
+                  ? formatCompact(stat.value)
+                  : formatFull(stat.value)}
+              </span>
+            </dd>
+            <p class="mt-2 text-meta leading-snug text-ink-faint">
+              {stat.note}
+            </p>
+          </div>
+        ))}
+      </dl>
+    </div>
   </div>
 </section>
+
+<style>
+  .hero-glow {
+    background: radial-gradient(
+      40rem circle at var(--px, 74%) var(--py, 4%),
+      color-mix(in oklab, var(--accent) 16%, transparent),
+      transparent 68%
+    );
+    transition: background 120ms linear;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-glow {
+      background: radial-gradient(
+        40rem circle at 74% 4%,
+        color-mix(in oklab, var(--accent) 12%, transparent),
+        transparent 68%
+      );
+    }
+  }
+</style>
