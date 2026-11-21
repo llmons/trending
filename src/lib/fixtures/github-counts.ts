@@ -2,7 +2,7 @@
  * Synthetic GitHub search counts for **local mock builds only**.
  *
  * `pnpm build:mock` / `pnpm dev:mock` set `TRENDING_MOCK=1`, which swaps the
- * 117-request GitHub search pipeline for this table. Nothing else changes:
+ * 114-request GitHub search pipeline for this table. Nothing else changes:
  * the rolling window is still computed at build time, the tier/weighted/
  * category derivations still run in `data.ts`, and the pkg.go.dev request
  * counts are still fetched live.
