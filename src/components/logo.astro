@@ -8,18 +8,18 @@ const { href = import.meta.env.BASE_URL } = Astro.props
 
 <a
   href={href}
-  class="group inline-flex items-center gap-2.5"
+  class="group inline-flex items-center gap-2"
   aria-label="trending — home"
 >
   <svg
     viewBox="0 0 1024 957.873"
-    class="size-5 transition-transform group-hover:scale-110"
+    class="size-[18px] shrink-0 origin-bottom-left transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.12] group-active:scale-[0.96]"
     aria-hidden="true"
   >
-    <!-- the trending mark — canonical artwork in public/logo.svg (accent blue #2a78d6) -->
+    <!-- the trending mark — canonical artwork in public/logo.svg -->
     <use href={`${import.meta.env.BASE_URL}logo.svg#mark`} />
   </svg>
-  <span class="font-heading text-sm font-bold tracking-[0.25em] uppercase">
+  <span class="font-mono text-[0.75rem] font-medium tracking-[0.26em] uppercase">
     trending
   </span>
 </a>

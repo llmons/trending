@@ -1,104 +1,120 @@
 ---
-import { Separator } from "@/components/ui/separator"
 import Logo from "@/components/logo.astro"
 import { githubSearchUrl, loadRankings } from "@/lib/data"
 import { formatDate, formatDateTime } from "@/lib/format"
+import { navLinks } from "@/lib/nav"
 
 const { meta } = loadRankings()
-const sourceUrl = githubSearchUrl(meta.window)
 const base = import.meta.env.BASE_URL
+const links = navLinks(base)
+const sourceHref = githubSearchUrl(meta.window)
 ---
 
-<footer class="border-t border-border">
-  <div class="mx-auto w-full max-w-6xl px-6">
+<footer class="border-t border-line">
+  <div class="wrap">
     <p
-      class="pt-12 font-serif text-[clamp(2.5rem,9vw,6.5rem)] leading-none tracking-tight text-border select-none"
+      class="pt-12 font-mono text-[clamp(3.25rem,17vw,15rem)] leading-[0.78] font-medium tracking-[-0.05em] text-line select-none"
       aria-hidden="true"
     >
       trending
     </p>
 
-    <div class="grid gap-10 py-14 md:grid-cols-[1.5fr_1fr_1fr]">
-      <div class="space-y-4">
+    <div class="grid gap-10 py-12 md:grid-cols-12 md:gap-8">
+      <div class="md:col-span-5">
         <Logo />
-        <p class="max-w-sm text-sm leading-relaxed text-muted-foreground">
-          A daily index of what the world is building — programming languages
-          ranked by new public GitHub repositories created in a rolling one-year
-          window, plus Go web and RPC frameworks ranked by pkg.go.dev
-          imported-by counts and JS full-stack frameworks ranked by npm
-          downloads.
+        <p class="mt-5 max-w-sm text-meta leading-relaxed text-ink-soft">
+          Three public data sources and one static build a day: GitHub
+          repository creation over a rolling year, pkg.go.dev imported-by
+          counts, and npm downloads over the trailing 30 days.
         </p>
       </div>
 
-      <div class="space-y-3 text-sm">
-        <p class="text-xs font-semibold tracking-widest uppercase">The data</p>
-        <ul class="space-y-2 text-muted-foreground">
-          <li>
-            Window: {formatDate(meta.window.from)} →{" "}
-            {formatDate(meta.window.to)}
-          </li>
-          <li>{meta.languagesTracked} mainstream languages tracked</li>
-          <li>Public GitHub search API, no credentials</li>
+      <div class="md:col-span-3">
+        <p class="label">This build</p>
+        <dl class="mt-4 space-y-2.5 text-meta">
+          <div class="flex justify-between gap-4 border-b border-line-soft pb-2.5">
+            <dt class="text-ink-faint">Window</dt>
+            <dd class="num text-right text-ink">
+              {formatDate(meta.window.from)} → {formatDate(meta.window.to)}
+            </dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-line-soft pb-2.5">
+            <dt class="text-ink-faint">Languages</dt>
+            <dd class="num text-ink">{meta.languagesTracked}</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-line-soft pb-2.5">
+            <dt class="text-ink-faint">Generated</dt>
+            <dd class="num text-right text-ink">
+              {formatDateTime(meta.generatedAt)}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="md:col-span-2">
+        <p class="label">Index</p>
+        <ul class="mt-4 space-y-2.5 text-meta">
+          {links.slice(0, 3).map((link) => (
+            <li>
+              <a
+                class="link-draw text-ink-soft hover:text-ink"
+                href={link.href}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
 
-      <div class="space-y-3 text-sm">
-        <p class="text-xs font-semibold tracking-widest uppercase">Elsewhere</p>
-        <ul class="space-y-2 text-muted-foreground">
+      <div class="md:col-span-2">
+        <p class="label">Sources</p>
+        <ul class="mt-4 space-y-2.5 text-meta">
           <li>
             <a
-              class="transition-colors hover:text-foreground"
-              href={`${base}#ranking`}
-            >
-              The ranking
-            </a>
-          </li>
-          <li>
-            <a
-              class="transition-colors hover:text-foreground"
-              href={`${base}go/`}
-            >
-              Go frameworks
-            </a>
-          </li>
-          <li>
-            <a
-              class="transition-colors hover:text-foreground"
-              href={`${base}js/`}
-            >
-              JS frameworks
-            </a>
-          </li>
-          <li>
-            <a
-              class="transition-colors hover:text-foreground"
-              href={`${base}methodology`}
-            >
-              Methodology
-            </a>
-          </li>
-          <li>
-            <a
-              class="transition-colors hover:text-foreground"
-              href={sourceUrl}
+              class="link-draw text-ink-soft hover:text-ink"
+              href={sourceHref}
               target="_blank"
               rel="noopener noreferrer"
             >
-              Live GitHub search
+              GitHub search
+            </a>
+          </li>
+          <li>
+            <a
+              class="link-draw text-ink-soft hover:text-ink"
+              href="https://pkg.go.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              pkg.go.dev
+            </a>
+          </li>
+          <li>
+            <a
+              class="link-draw text-ink-soft hover:text-ink"
+              href="https://www.npmjs.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              npm registry
+            </a>
+          </li>
+          <li>
+            <a
+              class="link-draw text-ink-soft hover:text-ink"
+              href={`${base}methodology/`}
+            >
+              Methodology
             </a>
           </li>
         </ul>
       </div>
     </div>
 
-    <Separator />
-
-    <div class="flex flex-col gap-2 py-6 text-xs tracking-wider uppercase text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-      <p>© {new Date().getFullYear()} trending</p>
-      <p>
-        Last generated {formatDateTime(meta.generatedAt)} · fetched live at
-        build time
-      </p>
+    <div class="flex flex-col gap-2 border-t border-line-soft py-6 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-faint uppercase sm:flex-row sm:items-center sm:justify-between">
+      <p>© {new Date().getFullYear()} trending · MIT</p>
+      <p>Static build · every count fetched at build time</p>
     </div>
   </div>
 </footer>

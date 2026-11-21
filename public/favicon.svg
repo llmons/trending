@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="957.873" viewBox="0 0 1024 957.873">
-  <!-- Single theme-independent favicon: the mark in the site's accent blue (#2a78d6)
+  <!-- Single theme-independent favicon: the mark in the site's accent blue (#1c68cc)
        on a transparent background, visible on both light and dark tab bars. -->
-  <g fill="#2a78d6">
-<path d="M 768.567 255.433 C 627.496 255.433 513.135 369.794 513.135 510.865 L 768.567 510.865 L 768.567 255.433 Z" fill="#2a78d6" fill-rule="evenodd"/><path d="M 1024 0 C 882.928 0 768.567 114.361 768.567 255.433 L 1024 255.433 L 1024 0 Z" fill="#2a78d6" fill-rule="evenodd"/><path d="M 513.135 734.369 L 768.567 734.369 L 768.567 957.873 L 513.135 957.873 Z" fill="#2a78d6" fill-rule="evenodd"/><path d="M 768.567 510.865 L 1024 510.865 L 1024 734.369 L 768.567 734.369 Z" fill="#2a78d6" fill-rule="evenodd"/><path d="M 77.846 787.312 C 28.402 830.194 0 892.423 0 957.873 L 257.702 957.873 L 257.702 734.369 C 192.91 725.113 127.29 744.429 77.846 787.312 Z" fill="#2a78d6" fill-rule="evenodd"/><path d="M 513.135 510.865 C 383.646 509.85 273.884 605.892 257.702 734.369 L 513.135 734.369 L 513.135 510.865 Z" fill="#2a78d6" fill-rule="evenodd"/>
+  <g fill="#1c68cc">
+<path d="M 768.567 255.433 C 627.496 255.433 513.135 369.794 513.135 510.865 L 768.567 510.865 L 768.567 255.433 Z" fill="#1c68cc" fill-rule="evenodd"/><path d="M 1024 0 C 882.928 0 768.567 114.361 768.567 255.433 L 1024 255.433 L 1024 0 Z" fill="#1c68cc" fill-rule="evenodd"/><path d="M 513.135 734.369 L 768.567 734.369 L 768.567 957.873 L 513.135 957.873 Z" fill="#1c68cc" fill-rule="evenodd"/><path d="M 768.567 510.865 L 1024 510.865 L 1024 734.369 L 768.567 734.369 Z" fill="#1c68cc" fill-rule="evenodd"/><path d="M 77.846 787.312 C 28.402 830.194 0 892.423 0 957.873 L 257.702 957.873 L 257.702 734.369 C 192.91 725.113 127.29 744.429 77.846 787.312 Z" fill="#1c68cc" fill-rule="evenodd"/><path d="M 513.135 510.865 C 383.646 509.85 273.884 605.892 257.702 734.369 L 513.135 734.369 L 513.135 510.865 Z" fill="#1c68cc" fill-rule="evenodd"/>
   </g>
 </svg>

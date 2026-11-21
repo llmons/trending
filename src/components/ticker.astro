@@ -1,49 +1,50 @@
 ---
-import type { RankedLanguage } from "@/lib/tiers"
 import { formatCompact } from "@/lib/format"
+import type { WeightedLanguage } from "@/lib/tiers"
 
 interface Props {
-  ranked: RankedLanguage[]
+  ranked: WeightedLanguage[]
 }
 
 const { ranked } = Astro.props
-
 const items = ranked.map((language) => ({
   name: language.name,
-  repos: formatCompact(language.repos),
+  score: formatCompact(language.score),
 }))
 ---
 
 <section
-  class="overflow-hidden border-b border-border"
-  aria-label="Language index ticker"
+  class="ticker relative overflow-hidden border-b border-line"
+  aria-label="Language index"
 >
-  <div class="ticker flex">
-    <ul class="ticker-track flex shrink-0 items-center py-4">
+  <div class="ticker-fade" aria-hidden="true"></div>
+  <div class="flex">
+    <ul class="ticker-track flex shrink-0 items-center py-3.5">
       {items.map((item) => (
         <li class="flex items-center whitespace-nowrap">
-          <span class="pl-10 text-xs font-semibold tracking-widest uppercase">
+          <span class="font-mono text-[0.6875rem] tracking-[0.1em] text-ink uppercase">
             {item.name}
           </span>
-          <span class="pl-2.5 font-serif text-sm text-muted-foreground tabular-nums">
-            {item.repos}
+          <span class="num pl-2.5 text-[0.6875rem] text-ink-faint">
+            {item.score}
           </span>
-          <span class="pl-10 text-viz-accent" aria-hidden="true">
-            ·
-          </span>
+          <span class="mx-6 size-1 bg-accent" aria-hidden="true" />
         </li>
       ))}
     </ul>
-    <ul class="ticker-track flex shrink-0 items-center py-4" aria-hidden="true">
+    <ul
+      class="ticker-track flex shrink-0 items-center py-3.5"
+      aria-hidden="true"
+    >
       {items.map((item) => (
         <li class="flex items-center whitespace-nowrap">
-          <span class="pl-10 text-xs font-semibold tracking-widest uppercase">
+          <span class="font-mono text-[0.6875rem] tracking-[0.1em] text-ink uppercase">
             {item.name}
           </span>
-          <span class="pl-2.5 font-serif text-sm text-muted-foreground tabular-nums">
-            {item.repos}
+          <span class="num pl-2.5 text-[0.6875rem] text-ink-faint">
+            {item.score}
           </span>
-          <span class="pl-10 text-viz-accent">·</span>
+          <span class="mx-6 size-1 bg-accent" />
         </li>
       ))}
     </ul>
@@ -52,16 +53,33 @@ const items = ranked.map((language) => ({
 
 <style>
   .ticker-track {
-    animation: ticker-marquee 80s linear infinite;
+    animation: ticker-marquee 90s linear infinite;
   }
+
   .ticker:hover .ticker-track {
     animation-play-state: paused;
   }
+
+  .ticker-fade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      to right,
+      var(--canvas) 0%,
+      transparent 8%,
+      transparent 92%,
+      var(--canvas) 100%
+    );
+  }
+
   @keyframes ticker-marquee {
     to {
       transform: translateX(-100%);
     }
   }
+
   @media (prefers-reduced-motion: reduce) {
     .ticker-track {
       animation: none;

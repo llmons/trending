@@ -12,8 +12,8 @@ interface Props {
 }
 
 const {
-  title = "trending — what the world is building",
-  description = "Daily rankings of what the world is building: GitHub-created-repo rankings of mainstream programming languages, plus pkg.go.dev imported-by rankings of Go web and RPC frameworks — rebuilt every day.",
+  title = "trending — daily rankings of programming languages and frameworks",
+  description = "Daily rankings built from public APIs: mainstream programming languages by new GitHub repositories, Go frameworks by pkg.go.dev imported-by counts, and JS frameworks by npm downloads.",
   noindex = false,
 } = Astro.props
 
@@ -21,12 +21,14 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" data-type="software">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#101012" />
+    <meta name="theme-color" content="#08090c" />
+    <meta name="page-type" content="software" />
+    <meta name="site-kind" content="software" />
     <link
       rel="icon"
       type="image/svg+xml"
@@ -38,29 +40,35 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="trending" />
+    <meta name="twitter:card" content="summary" />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl.href} />}
     <script is:inline>
-      // Resolve the theme before first paint (dark is the default).
-      // A `?theme=light|dark` query param overrides the stored preference.
-      try {
-        const forced = new URLSearchParams(location.search).get("theme")
-        const stored = localStorage.getItem("trending:theme")
-        const dark = forced
-          ? forced === "dark"
-          : stored
-            ? stored === "dark"
-            : window.matchMedia("(prefers-color-scheme: dark)").matches
-        document.documentElement.classList.toggle("dark", dark)
-        document.documentElement.style.colorScheme = dark ? "dark" : "light"
-      } catch {
-        document.documentElement.classList.add("dark")
-      }
+      // Resolve the theme and arm motion before first paint. Dark is the
+      // default; a stored choice or `?theme=light|dark` wins.
+      ;(() => {
+        const root = document.documentElement
+        root.classList.add("js")
+        try {
+          const forced = new URLSearchParams(location.search).get("theme")
+          const stored = localStorage.getItem("trending:theme")
+          const dark = forced
+            ? forced === "dark"
+            : stored
+              ? stored === "dark"
+              : !window.matchMedia("(prefers-color-scheme: light)").matches
+          root.classList.toggle("dark", dark)
+          root.style.colorScheme = dark ? "dark" : "light"
+        } catch {
+          root.classList.add("dark")
+        }
+      })()
     </script>
   </head>
-  <body class="flex min-h-svh flex-col bg-background text-foreground antialiased">
+  <body class="flex min-h-svh flex-col bg-canvas text-ink antialiased">
     <a
       href="#content"
-      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-100 focus:bg-background focus:px-4 focus:py-2 focus:ring-1 focus:ring-border"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:border focus:border-line focus:bg-panel focus:px-4 focus:py-2.5 focus:font-mono focus:text-[0.6875rem] focus:tracking-[0.12em] focus:uppercase"
     >
       Skip to content
     </a>
@@ -69,5 +77,8 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null
       <slot />
     </main>
     <SiteFooter />
+    <script>
+      import "@/scripts/behavior"
+    </script>
   </body>
 </html>

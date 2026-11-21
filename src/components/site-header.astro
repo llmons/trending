@@ -1,54 +1,81 @@
 ---
-import { RiExternalLinkLine } from "@remixicon/react"
-
+import Icon from "@/components/icon.astro"
 import Logo from "@/components/logo.astro"
-import ThemeToggle from "@/components/theme-toggle"
+import NavMenu from "@/components/nav-menu.svelte"
+import ThemeToggle from "@/components/theme-toggle.svelte"
 import { githubSearchUrl, loadRankings } from "@/lib/data"
+import { navLinks } from "@/lib/nav"
 
 const { meta } = loadRankings()
-const sourceUrl = githubSearchUrl(meta.window)
-
-const navLinkClass =
-  "text-xs font-semibold tracking-widest uppercase text-muted-foreground transition-colors hover:text-foreground"
 const base = import.meta.env.BASE_URL
+const links = navLinks(base)
+const sourceHref = githubSearchUrl(meta.window)
+
+const currentPath = Astro.url.pathname
+const isCurrent = (href: string) =>
+  !href.includes("#") && new URL(href, Astro.url).pathname === currentPath
 ---
 
-<header class="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
-  <div class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-6 px-6">
+<header
+  data-header
+  class="site-header sticky top-0 z-50 border-b border-transparent"
+>
+  <div class="wrap flex h-14 items-center justify-between gap-4 md:h-16">
     <Logo />
 
-    <nav
-      class="hidden items-center gap-4 md:flex lg:gap-8"
-      aria-label="Primary"
-    >
-      <a class={navLinkClass} href={`${base}#ranking`}>
-        The ranking
-      </a>
-      <a class={navLinkClass} href={`${base}#insights`}>
-        Field notes
-      </a>
-      <a class={navLinkClass} href={`${base}go/`}>
-        Go frameworks
-      </a>
-      <a class={navLinkClass} href={`${base}js/`}>
-        JS frameworks
-      </a>
-      <a class={navLinkClass} href={`${base}methodology`}>
-        Methodology
-      </a>
+    <nav aria-label="Primary" class="hidden md:block">
+      <ul class="flex items-center gap-0.5">
+        {links.map((link) => (
+          <li>
+            <a
+              class="nav-item"
+              href={link.href}
+              aria-current={isCurrent(link.href) ? "page" : undefined}
+            >
+              {link.short}
+            </a>
+          </li>
+        ))}
+      </ul>
     </nav>
 
     <div class="flex items-center gap-1">
       <a
-        class="hidden items-center gap-1.5 px-2 text-xs font-semibold tracking-widest uppercase text-muted-foreground transition-colors hover:text-foreground lg:inline-flex"
-        href={sourceUrl}
+        class="nav-item hidden items-center gap-1.5 xl:inline-flex"
+        href={sourceHref}
         target="_blank"
         rel="noopener noreferrer"
       >
-        Source data
-        <RiExternalLinkLine className="size-3.5" />
+        GitHub search
+        <Icon name="arrow-up-right" size={13} />
       </a>
       <ThemeToggle client:load />
+      <NavMenu {links} {sourceHref} client:load />
     </div>
   </div>
 </header>
+
+<style>
+  .site-header {
+    transition:
+      border-color 300ms var(--ease-swift),
+      box-shadow 300ms var(--ease-swift);
+  }
+
+  /* The material lives on a pseudo-element: `backdrop-filter` on the header
+     itself would become the containing block for the fixed mobile sheet. */
+  .site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: color-mix(in oklab, var(--canvas) 84%, transparent);
+    -webkit-backdrop-filter: blur(22px) saturate(1.6);
+    backdrop-filter: blur(22px) saturate(1.6);
+  }
+
+  .site-header.is-scrolled {
+    border-bottom-color: var(--line);
+    box-shadow: 0 12px 30px -24px rgb(0 0 0 / 55%);
+  }
+</style>
