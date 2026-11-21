@@ -1,10 +1,6 @@
 ---
-import { RiArrowLeftLine } from "@remixicon/react"
-
-import { Badge } from "@/components/ui/badge"
-import { buttonVariants } from "@/components/ui/button"
-import MethodologyFaq from "@/components/methodology-faq"
-import { Separator } from "@/components/ui/separator"
+import Faq from "@/components/faq.svelte"
+import Icon from "@/components/icon.astro"
 import Layout from "@/layouts/main.astro"
 import { loadRankings } from "@/lib/data"
 import { formatDate } from "@/lib/format"
@@ -15,7 +11,8 @@ const queryExample = `language:JavaScript fork:false mirror:false stars:>=100 cr
 const apiUrl = `https://api.github.com/search/repositories?q=${encodeURIComponent(queryExample)}&per_page=1`
 
 const sectionHeadingClass =
-  "flex items-baseline gap-4 font-heading text-lg font-semibold tracking-widest uppercase md:text-xl"
+  "flex items-baseline gap-3.5 border-t border-line pt-4 text-[1.125rem] font-semibold tracking-[-0.015em] text-ink md:text-[1.25rem]"
+
 const base = import.meta.env.BASE_URL
 ---
 
@@ -23,39 +20,42 @@ const base = import.meta.env.BASE_URL
   title="Methodology — trending"
   description="How trending measures popularity: GitHub search queries for languages over a rolling one-year window, pkg.go.dev imported-by counts for Go frameworks, and npm downloads for JS frameworks."
 >
-  <section class="mx-auto w-full max-w-3xl px-6 pt-16 pb-24 md:pt-20">
-    <a href={base} class={buttonVariants({ variant: "ghost", size: "sm" })}>
-      <RiArrowLeftLine data-icon="inline-start" />
+  <section class="mx-auto w-full max-w-4xl px-5 pt-12 pb-24 sm:px-8 md:pt-16">
+    <a
+      href={base}
+      class="inline-flex items-center gap-2 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-faint uppercase transition-colors hover:text-ink"
+    >
+      <Icon name="arrow-left" size={13} />
       Back to the ranking
     </a>
 
-    <div class="mt-10 flex flex-wrap gap-3">
-      <Badge variant="secondary">
+    <div class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1">
+      <span class="label text-accent">Methodology</span>
+      <span class="label">
         Window: {formatDate(meta.window.from)} → {formatDate(meta.window.to)}
-      </Badge>
-      <Badge variant="secondary">{meta.languagesTracked} languages</Badge>
-      <Badge variant="secondary">3 star tiers</Badge>
-      <Badge variant="secondary">Updated daily</Badge>
+      </span>
+      <span class="label">{meta.languagesTracked} languages</span>
+      <span class="label">3 star tiers</span>
+      <span class="label">Updated daily</span>
     </div>
 
-    <h1 class="mt-8 text-4xl leading-[1.02] font-medium tracking-tight text-balance md:text-6xl">
-      How the <em class="text-viz-accent italic">numbers</em> are gathered.
+    <h1 class="mt-6 max-w-2xl text-headline font-semibold text-ink">
+      How each number on this page is produced.
     </h1>
 
-    <p class="mt-6 leading-relaxed text-muted-foreground md:text-lg">
-      Every number on this site is a single count read from a public API: the
-      number of repositories created in a rolling one-year window and tagged
-      with a given language. The framework sections use different sources and
-      say so where they appear. There is no sampling, no estimation, and no
-      secret sauce — just a deliberately scoped pipeline.
+    <p class="mt-5 max-w-2xl text-lede text-ink-soft">
+      Every count is read from a public API: repositories created inside a
+      rolling one-year window and tagged with a given language, packages that
+      import a Go framework, installs of an npm package. The sources differ and
+      each section says which one it uses. No sampling, no estimation.
     </p>
 
-    <div class="mt-16 space-y-16">
+    <div class="mt-14 space-y-14">
       <div>
         <h2 class={sectionHeadingClass}>
-          <span class="text-viz-accent tabular-nums">01</span> What counts
+          <span class="num text-[0.6875rem] text-accent">01</span> What counts
         </h2>
-        <ul class="mt-5 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+        <ul class="mt-5 list-disc space-y-2 pl-5 leading-relaxed text-ink-soft">
           <li>
             A repository counts if it was <em>created</em> inside the window and
             is tagged with the language.
@@ -72,17 +72,17 @@ const base = import.meta.env.BASE_URL
           </li>
           <li>
             The count is the search result's{" "}
-            <code class="font-serif">total_count</code> — GitHub computes it, we
-            don't.
+            <code class="font-mono text-[0.9em]">total_count</code> — GitHub
+            computes it, we don't.
           </li>
         </ul>
       </div>
 
       <div>
         <h2 class={sectionHeadingClass}>
-          <span class="text-viz-accent tabular-nums">02</span> The window
+          <span class="num text-[0.6875rem] text-accent">02</span> The window
         </h2>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           The "last year" is never hardcoded. On every build, the window is
           computed as <em>today minus 365 days → today</em>, in UTC, inclusive
           on both ends.
@@ -91,45 +91,45 @@ const base = import.meta.env.BASE_URL
 
       <div>
         <h2 class={sectionHeadingClass}>
-          <span class="text-viz-accent tabular-nums">03</span> The query
+          <span class="num text-[0.6875rem] text-accent">03</span> The query
         </h2>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           Three queries per language — one per star tier. Here is the exact
           query behind the JavaScript count in the top tier:
         </p>
-        <pre class="mt-4 overflow-x-auto border border-border bg-muted/40 p-4 text-sm leading-relaxed"><code>{queryExample}</code></pre>
-        <p class="mt-3 leading-relaxed text-muted-foreground">
+        <pre class="mt-4 overflow-x-auto border border-line bg-panel-2 p-4 font-mono text-[0.75rem] leading-relaxed"><code>{queryExample}</code></pre>
+        <p class="mt-3 leading-relaxed text-ink-soft">
           The other tiers are the same query with{" "}
-          <code class="font-serif">stars:&gt;=20</code> or{" "}
-          <code class="font-serif">stars:&gt;=2</code> — every threshold is
-          inclusive, and repositories below 2 stars are deliberately out of
-          scope. Served from{" "}
-          <code class="break-all font-serif text-sm">api.github.com</code> with{" "}
-          <code class="font-serif">per_page=1</code> — only the total matters,
-          never the results.
+          <code class="font-mono text-[0.9em]">stars:&gt;=20</code> or{" "}
+          <code class="font-mono text-[0.9em]">stars:&gt;=2</code> — every
+          threshold is inclusive, and repositories below 2 stars are
+          deliberately out of scope. Served from{" "}
+          <code class="break-all font-mono text-[0.75rem]">api.github.com</code>{" "}
+          with <code class="font-mono text-[0.9em]">per_page=1</code> — only the
+          total matters, never the results.
         </p>
       </div>
 
       <div>
         <h2 class={sectionHeadingClass}>
-          <span class="text-viz-accent tabular-nums">04</span> Rate limits &amp;
-          throttling
+          <span class="num text-[0.6875rem] text-accent">04</span> Rate limits
+          &amp; throttling
         </h2>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           Local builds call the API without credentials and are bound by the
           public search limit:{" "}
-          <strong class="text-foreground">10 requests per minute</strong> per IP
+          <strong class="text-ink">10 requests per minute</strong> per IP
           address — and GitHub Actions shares runner IPs across many
           repositories, so that pool can be exhausted by strangers. The daily CI
           build therefore authenticates with the automatically injected{" "}
-          <code class="font-serif">GITHUB_TOKEN</code>: a dedicated{" "}
-          <strong class="text-foreground">30 requests per minute</strong> per
-          build. The fetcher paces itself to exactly one request every 6 seconds
+          <code class="font-mono text-[0.9em]">GITHUB_TOKEN</code>: a dedicated{" "}
+          <strong class="text-ink">30 requests per minute</strong> per build.
+          The fetcher paces itself to exactly one request every 6 seconds
           (unauthenticated) or 2 seconds (authenticated), honors{" "}
-          <code class="font-serif">x-ratelimit-remaining</code> and{" "}
-          <code class="font-serif">retry-after</code> headers, and waits out the
-          documented reset window when the budget runs dry. A full refresh —
-          three tiers across {meta.languagesTracked} languages,{" "}
+          <code class="font-mono text-[0.9em]">x-ratelimit-remaining</code> and{" "}
+          <code class="font-mono text-[0.9em]">retry-after</code> headers, and
+          waits out the documented reset window when the budget runs dry. A full
+          refresh — three tiers across {meta.languagesTracked} languages,{" "}
           {meta.languagesTracked * 3} requests — takes under five minutes in CI
           and under twelve minutes locally.
         </p>
@@ -137,13 +137,13 @@ const base = import.meta.env.BASE_URL
 
       <div>
         <h2 class={sectionHeadingClass}>
-          <span class="text-viz-accent tabular-nums">05</span> Scope —
+          <span class="num text-[0.6875rem] text-accent">05</span> Scope —
           mainstream only
         </h2>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
-          This is a popularity index for the languages people actually build
-          with, not a census of every language GitHub can tag. The catalog is
-          hand-curated to common, general-purpose languages and the widely used
+        <p class="mt-5 leading-relaxed text-ink-soft">
+          This is a popularity index for the languages people build with, not a
+          census of every language GitHub can tag. The catalog is hand-curated
+          to common, general-purpose languages and the widely used
           special-purpose ones (web markup, data science, systems scripting).
           Esoteric and niche languages are intentionally excluded, and the
           catalog is the same every day so comparisons stay apples-to-apples.
@@ -152,9 +152,9 @@ const base = import.meta.env.BASE_URL
 
       <div>
         <h2 class={sectionHeadingClass}>
-          <span class="text-viz-accent tabular-nums">06</span> Caveats
+          <span class="num text-[0.6875rem] text-accent">06</span> Caveats
         </h2>
-        <ul class="mt-5 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+        <ul class="mt-5 list-disc space-y-2 pl-5 leading-relaxed text-ink-soft">
           <li>
             A language tag is the repository's <em>primary</em> language from
             GitHub's Linguist detection, and it can occasionally mis-tag a
@@ -181,15 +181,15 @@ const base = import.meta.env.BASE_URL
 
       <div>
         <h2 class={sectionHeadingClass}>
-          <span class="text-viz-accent tabular-nums">07</span> The weighted
+          <span class="num text-[0.6875rem] text-accent">07</span> The weighted
           score
         </h2>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
-          The weighted ranking in the Field notes folds the three tiers into one
-          composite. Each tier's count is multiplied by a weight that grows with
-          the threshold — <strong class="text-foreground">1×</strong> at ≥2
-          stars, <strong class="text-foreground">2×</strong> at ≥20,{" "}
-          <strong class="text-foreground">4×</strong> at ≥100 — and summed per
+        <p class="mt-5 leading-relaxed text-ink-soft">
+          The weighted ranking that leads the home page folds the three tiers
+          into one composite. Each tier's count is multiplied by a weight that
+          grows with the threshold — <strong class="text-ink">1×</strong> at ≥2
+          stars, <strong class="text-ink">2×</strong> at ≥20,{" "}
+          <strong class="text-ink">4×</strong> at ≥100 — and summed per
           language. Because the tiers are nested, a repository that cleared
           every threshold contributes 1+2+4 = 7 points while one below 2 stars
           contributes nothing at all: the harder a repository was to earn, the
@@ -198,112 +198,112 @@ const base = import.meta.env.BASE_URL
         </p>
       </div>
 
-      <div id="go-frameworks">
+      <div id="go-frameworks" class="scroll-mt-24">
         <h2 class={sectionHeadingClass}>
-          <span class="text-viz-accent tabular-nums">08</span> Go frameworks —
-          imported-by
+          <span class="num text-[0.6875rem] text-accent">08</span> Go frameworks
+          — imported-by
         </h2>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
-          The <code class="font-serif">/go/</code> ranking covers a hand-curated
-          catalog of 9 Go frameworks — five web frameworks (Gin, Echo, Fiber,
-          GoFrame, Hertz) and four RPC frameworks (gRPC-Go, Thrift, Dubbo,
-          Kitex) — measured from a different source: pkg.go.dev's official v1
-          API. One keyless request per framework —{" "}
-          <code class="break-all font-serif text-sm">
+        <p class="mt-5 leading-relaxed text-ink-soft">
+          The <code class="font-mono text-[0.9em]">/go/</code> ranking covers a
+          hand-curated catalog of 9 Go frameworks — five web frameworks (Gin,
+          Echo, Fiber, GoFrame, Hertz) and four RPC frameworks (gRPC-Go, Thrift,
+          Dubbo, Kitex) — measured from a different source: pkg.go.dev's
+          official v1 API. One keyless request per framework —{" "}
+          <code class="break-all font-mono text-[0.75rem]">
             {"GET https://pkg.go.dev/v1/imported-by/{package-path}"}
           </code>{" "}
           — returns the number of packages in the public Go module universe that
           import it directly. As of Nov 2026, for example, gRPC-Go is imported
           by 270,134 packages and Gin by 191,418. A full refresh is ~9 requests
           paced at one per second, fetched inside{" "}
-          <code class="font-serif">astro build</code> by{" "}
-          <code class="font-serif">src/lib/pkgsite.ts</code> under the same
-          all-or-nothing rule as the language pipeline: a count that ultimately
-          fails fails the build.
+          <code class="font-mono text-[0.9em]">astro build</code> by{" "}
+          <code class="font-mono text-[0.9em]">src/lib/pkgsite.ts</code> under
+          the same all-or-nothing rule as the language pipeline: a count that
+          ultimately fails fails the build.
         </p>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           Each framework is counted at exactly one canonical package — the
           import typical user code makes per the framework's own quickstart:
         </p>
-        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-ink-soft">
           <li>
-            <strong class="text-foreground">gin</strong> —{" "}
-            <code class="break-all font-serif text-sm">
+            <strong class="text-ink">Gin</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
               github.com/gin-gonic/gin
             </code>
           </li>
           <li>
-            <strong class="text-foreground">Echo</strong> —{" "}
-            <code class="break-all font-serif text-sm">
+            <strong class="text-ink">Echo</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
               github.com/labstack/echo/v4
             </code>
           </li>
           <li>
-            <strong class="text-foreground">Fiber</strong> —{" "}
-            <code class="break-all font-serif text-sm">
+            <strong class="text-ink">Fiber</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
               github.com/gofiber/fiber/v2
             </code>
           </li>
           <li>
-            <strong class="text-foreground">GoFrame</strong> —{" "}
-            <code class="break-all font-serif text-sm">
+            <strong class="text-ink">GoFrame</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
               github.com/gogf/gf/v2/frame/g
             </code>
           </li>
           <li>
-            <strong class="text-foreground">Hertz</strong> —{" "}
-            <code class="break-all font-serif text-sm">
+            <strong class="text-ink">Hertz</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
               github.com/cloudwego/hertz/pkg/app
             </code>
           </li>
           <li>
-            <strong class="text-foreground">gRPC-Go</strong> —{" "}
-            <code class="break-all font-serif text-sm">
+            <strong class="text-ink">gRPC-Go</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
               google.golang.org/grpc
             </code>
           </li>
           <li>
-            <strong class="text-foreground">Thrift</strong> —{" "}
-            <code class="break-all font-serif text-sm">
+            <strong class="text-ink">Thrift</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
               github.com/apache/thrift/lib/go/thrift
             </code>
           </li>
           <li>
-            <strong class="text-foreground">Dubbo</strong> —{" "}
-            <code class="break-all font-serif text-sm">
+            <strong class="text-ink">Dubbo</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
               dubbo.apache.org/dubbo-go/v3
             </code>
           </li>
           <li>
-            <strong class="text-foreground">Kitex</strong> —{" "}
-            <code class="break-all font-serif text-sm">
+            <strong class="text-ink">Kitex</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
               github.com/cloudwego/kitex/server
             </code>
           </li>
         </ul>
-        <p class="mt-4 leading-relaxed text-muted-foreground">
+        <p class="mt-4 leading-relaxed text-ink-soft">
           Frameworks with several plausible entry points are deliberately
           counted at a single canonical path — one path per framework keeps
-          every count on the same basis, comparability over completeness.
+          every count on the same basis: comparability over completeness.
         </p>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           The semantics differ from everything above: this is a{" "}
           <em>cumulative snapshot</em> taken at build time, not the rolling
           one-year window used for languages. Imported-by counts adoption{" "}
-          <strong class="text-foreground">stock</strong> — everything that
-          imports a framework today — while repository creation counts{" "}
-          <strong class="text-foreground">flow</strong>.
+          <strong class="text-ink">stock</strong> — everything that imports a
+          framework today — while repository creation counts{" "}
+          <strong class="text-ink">flow</strong>.
         </p>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           The number itself is produced by pkg.go.dev (the pkgsite project): it
           indexes every module version as proxy.golang.org caches it, parses Go
           imports out of the module zips, and maintains per-package importer
-          counts. We just read the total.
+          counts. We read the total.
         </p>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           A few caveats, in the same spirit as section 06:
         </p>
-        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-ink-soft">
           <li>
             Private, vendored, and internal-only code is invisible — only
             modules published through the public proxy/index count, so a
@@ -312,8 +312,8 @@ const base = import.meta.env.BASE_URL
           </li>
           <li>
             Code generators inflate the RPC frameworks: services generated into{" "}
-            <code class="font-serif">kitex_gen</code> still import{" "}
-            <code class="break-all font-serif text-sm">
+            <code class="font-mono text-[0.9em]">kitex_gen</code> still import{" "}
+            <code class="break-all font-mono text-[0.75rem]">
               github.com/cloudwego/kitex/server
             </code>{" "}
             — one generated service can contribute many importing packages.
@@ -322,7 +322,7 @@ const base = import.meta.env.BASE_URL
             One canonical path can undercount a multi-package framework.
             Dubbo-go is counted at its root package because that is what its
             quickstart imports; code that only imports a subpackage such as{" "}
-            <code class="break-all font-serif text-sm">
+            <code class="break-all font-mono text-[0.75rem]">
               dubbo.apache.org/dubbo-go/v3/config
             </code>{" "}
             is not folded in — summing subpackages would double-count every
@@ -334,7 +334,7 @@ const base = import.meta.env.BASE_URL
             rebuilt daily.
           </li>
         </ul>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           Why importers, and not stars or downloads? GitHub stars measure
           sentiment, not usage — a starred framework may never be imported. And
           Go has no public download counter: proxy.golang.org and goproxy.cn
@@ -344,17 +344,17 @@ const base = import.meta.env.BASE_URL
         </p>
       </div>
 
-      <div id="js-frameworks">
+      <div id="js-frameworks" class="scroll-mt-24">
         <h2 class={sectionHeadingClass}>
-          <span class="text-viz-accent tabular-nums">09</span> JS frameworks —
-          npm downloads
+          <span class="num text-[0.6875rem] text-accent">09</span> JS frameworks
+          — npm downloads
         </h2>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
-          The <code class="font-serif">/js/</code> ranking covers a hand-curated
-          catalog of 5 full-stack JS/TS meta-frameworks — Next.js, Astro,
-          SvelteKit, Nuxt, and SolidStart — measured from the npm registry's
-          public downloads API. One keyless request per framework —{" "}
-          <code class="break-all font-serif text-sm">
+        <p class="mt-5 leading-relaxed text-ink-soft">
+          The <code class="font-mono text-[0.9em]">/js/</code> ranking covers a
+          hand-curated catalog of 5 full-stack JS/TS meta-frameworks — Next.js,
+          Astro, SvelteKit, Nuxt, and SolidStart — measured from the npm
+          registry's public downloads API. One keyless request per framework —{" "}
+          <code class="break-all font-mono text-[0.75rem]">
             {"GET https://api.npmjs.org/downloads/point/last-month/{package}"}
           </code>{" "}
           — returns the total number of installs of that package over the
@@ -362,54 +362,59 @@ const base = import.meta.env.BASE_URL
           complete UTC day rather than snapped to a calendar month, and the page
           always prints the exact dates the API reported. A full refresh is 5
           requests paced at one per second, fetched inside{" "}
-          <code class="font-serif">astro build</code> by{" "}
-          <code class="font-serif">src/lib/npm.ts</code> under the same
-          all-or-nothing rule as the other pipelines: a count that ultimately
-          fails fails the build.
+          <code class="font-mono text-[0.9em]">astro build</code> by{" "}
+          <code class="font-mono text-[0.9em]">src/lib/npm.ts</code> under the
+          same all-or-nothing rule as the other pipelines: a count that
+          ultimately fails fails the build.
         </p>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           Each framework is counted at exactly one package — its{" "}
           <em>meta-framework</em> entry point, the thing a new project actually
           installs:
         </p>
-        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-ink-soft">
           <li>
-            <strong class="text-foreground">Next.js</strong> —{" "}
-            <code class="break-all font-serif text-sm">next</code>
+            <strong class="text-ink">Next.js</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">next</code>
           </li>
           <li>
-            <strong class="text-foreground">Astro</strong> —{" "}
-            <code class="break-all font-serif text-sm">astro</code>
+            <strong class="text-ink">Astro</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">astro</code>
           </li>
           <li>
-            <strong class="text-foreground">SvelteKit</strong> —{" "}
-            <code class="break-all font-serif text-sm">@sveltejs/kit</code>
+            <strong class="text-ink">SvelteKit</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
+              @sveltejs/kit
+            </code>
           </li>
           <li>
-            <strong class="text-foreground">Nuxt</strong> —{" "}
-            <code class="break-all font-serif text-sm">nuxt</code>
+            <strong class="text-ink">Nuxt</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">nuxt</code>
           </li>
           <li>
-            <strong class="text-foreground">SolidStart</strong> —{" "}
-            <code class="break-all font-serif text-sm">@solidjs/start</code>
+            <strong class="text-ink">SolidStart</strong> —{" "}
+            <code class="break-all font-mono text-[0.75rem]">
+              @solidjs/start
+            </code>
           </li>
         </ul>
-        <p class="mt-4 leading-relaxed text-muted-foreground">
+        <p class="mt-4 leading-relaxed text-ink-soft">
           Why the meta-framework and not the renderer? Because{" "}
-          <code class="font-serif">svelte</code> and{" "}
-          <code class="font-serif">solid-js</code> are installed for reasons
-          that have nothing to do with building an app: they are pulled in
-          transitively by editor tooling, component libraries, and other
-          packages. In Nov 2026, <code class="font-serif">solid-js</code>{" "}
-          recorded roughly 49.5M monthly installs against 0.9M for{" "}
-          <code class="font-serif">@solidjs/start</code> — counting the renderer
-          would have ranked Solid second in the group instead of last, on a
-          number that measures something else entirely. One package per
-          framework keeps the comparison like-for-like.
+          <code class="font-mono text-[0.9em]">svelte</code> and{" "}
+          <code class="font-mono text-[0.9em]">solid-js</code> are installed for
+          reasons that have nothing to do with building an app: they are pulled
+          in transitively by editor tooling, component libraries, and other
+          packages. In Nov 2026,{" "}
+          <code class="font-mono text-[0.9em]">solid-js</code> recorded roughly
+          49.5M monthly installs against 0.9M for{" "}
+          <code class="font-mono text-[0.9em]">@solidjs/start</code> — counting
+          the renderer would have ranked Solid second in the group instead of
+          last, on a number that measures something else entirely. One package
+          per framework keeps the comparison like-for-like.
         </p>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
-          The metric is a <strong class="text-foreground">flow</strong>, and a
-          noisy one: npm counts install events, not projects or people. CI
+        <p class="mt-5 leading-relaxed text-ink-soft">
+          The metric is a <strong class="text-ink">flow</strong>, and a noisy
+          one: npm counts install events, not projects or people. CI
           re-installs, container layers, lockfile-free deployments, transitive
           dependencies, and registry mirrors all inflate the totals, and nothing
           is deduplicated per machine — a framework reinstalled once an hour by
@@ -418,15 +423,15 @@ const base = import.meta.env.BASE_URL
           do not compare its totals with the language counts or the imported-by
           counts: those measure different things on different bases.
         </p>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           A few caveats, in the same spirit as sections 06 and 08:
         </p>
-        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+        <ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-ink-soft">
           <li>
             Scoped packages cannot be batched: the API's bulk lookup rejects
-            requests that mix <code class="font-serif">@scope/name</code>{" "}
-            packages, so every framework is fetched individually rather than in
-            one request.
+            requests that mix{" "}
+            <code class="font-mono text-[0.9em]">@scope/name</code> packages, so
+            every framework is fetched individually rather than in one request.
           </li>
           <li>
             No history is committed. The page shows only the current 30-day
@@ -445,7 +450,7 @@ const base = import.meta.env.BASE_URL
             to be defensible as a like-for-like comparison.
           </li>
         </ul>
-        <p class="mt-5 leading-relaxed text-muted-foreground">
+        <p class="mt-5 leading-relaxed text-ink-soft">
           Why downloads, and not stars? Stars record attention; downloads record
           the build happening. Neither is a user count, but an install is at
           least the artefact of somebody wiring the framework into a project.
@@ -453,25 +458,25 @@ const base = import.meta.env.BASE_URL
       </div>
     </div>
 
-    <Separator className="my-16" />
+    <div class="my-16 border-t border-line"></div>
 
     <h2 class={sectionHeadingClass}>
-      <span class="text-viz-accent tabular-nums">FAQ</span> Frequently asked
+      <span class="num text-[0.6875rem] text-accent">FAQ</span> Frequently asked
     </h2>
-    <MethodologyFaq client:load />
+    <Faq client:load />
 
-    <div class="mt-16 border border-border p-8">
-      <p class="font-serif text-2xl leading-snug md:text-3xl">
-        Curious about a specific count?{" "}
+    <div class="mt-16 border border-line bg-panel p-6 sm:p-8">
+      <p class="max-w-2xl text-[1.0625rem] leading-relaxed text-ink-soft">
+        Any count on this site can be reproduced.{" "}
         <a
-          class="text-viz-accent underline decoration-1 underline-offset-4 transition-opacity hover:opacity-80"
+          class="link-draw text-accent"
           href={apiUrl}
           target="_blank"
           rel="noopener noreferrer"
         >
           Run the exact query yourself
         </a>{" "}
-        — it's public.
+        — the API is public.
       </p>
     </div>
   </section>
