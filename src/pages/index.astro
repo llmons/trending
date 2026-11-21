@@ -1,29 +1,29 @@
 ---
-import { RiArrowRightLine } from "@remixicon/react"
-
 import CategoryBreakdown from "@/components/category-breakdown.astro"
 import Concentration from "@/components/concentration.astro"
 import Hero from "@/components/hero.astro"
+import Icon from "@/components/icon.astro"
 import MethodologyCard from "@/components/methodology-card.astro"
 import QualityLadder from "@/components/quality-ladder.astro"
-import RankingSection from "@/components/ranking-section"
 import SectionHeading from "@/components/section-heading.astro"
+import TierSwitch from "@/components/tier-switch.svelte"
 import Ticker from "@/components/ticker.astro"
-import { buttonVariants } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card"
-import WeightedRanking from "@/components/weighted-ranking.astro"
+import WeightedTable from "@/components/weighted-table.astro"
 import Layout from "@/layouts/main.astro"
 import { loadRankings } from "@/lib/data"
-import { formatDate } from "@/lib/format"
+import { formatCompact, formatDate } from "@/lib/format"
+import { loadJsFrameworkRankings } from "@/lib/npm"
+import { loadFrameworkRankings } from "@/lib/pkgsite"
 
 const data = loadRankings()
+const go = loadFrameworkRankings()
+const js = loadJsFrameworkRankings()
+
 const { meta, tiers } = data
 const base = import.meta.env.BASE_URL
+
+const goLeader = go.ranked[0]
+const jsLeader = js.ranked[0]
 
 const top3 = tiers.ge2.ranked.slice(0, 3)
 const top3Share = top3.reduce((sum, language) => sum + language.share, 0)
@@ -60,44 +60,60 @@ const datasetSchema = {
   noindex={meta.sample}
 >
   {meta.sample && (
-    <div class="border-b border-border bg-muted/40">
-      <p class="mx-auto w-full max-w-6xl px-6 py-2.5 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+    <div class="border-b border-line bg-panel-2">
+      <p class="wrap py-2.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-soft uppercase">
+        <span class="mr-2 inline-block size-1.5 translate-y-[-1px] bg-accent" />
         Sample data · GitHub counts are synthetic (local mock build) — framework
         counts stay live
       </p>
     </div>
   )}
-  <Hero data={data} />
-  <Ticker ranked={tiers.ge2.ranked} />
 
-  <section
-    id="ranking"
-    class="mx-auto w-full max-w-6xl scroll-mt-24 px-6 py-20 md:py-28"
-  >
-    <SectionHeading
-      index="01"
-      title="The ranking"
-      aside={`${meta.languagesTracked} languages · ${formatDate(meta.window.from)} → ${formatDate(meta.window.to)}`}
-      description="New public GitHub repositories created in the last year, counted per language. Forks and mirrors excluded; repositories need at least 2 stars to count. Switch the tier to see how the ranking shifts at the 20- and 100-star thresholds."
-    />
-    <RankingSection tiers={tiers} client:load />
+  <Hero data={data} />
+  <Ticker ranked={data.weighted.ranked} />
+
+  <section id="ranking" class="scroll-mt-20">
+    <div class="wrap pt-16 md:pt-24">
+      <SectionHeading
+        index="01"
+        title="The ranking"
+        aside={`top 10 of ${meta.languagesTracked} · weighted`}
+        description="Each language's repository count is weighted by the star threshold it cleared — 1× at ≥2 stars, 2× at ≥20, 4× at ≥100 — then summed. A repository that cleared every threshold contributes seven points; one below two stars contributes none."
+      />
+    </div>
+
+    <div class="wrap pb-20 md:pb-28">
+      <WeightedTable data={data} />
+    </div>
   </section>
 
-  <section id="insights" class="scroll-mt-24 border-t border-border">
-    <div class="mx-auto w-full max-w-6xl px-6 py-20 md:py-28">
+  <section id="thresholds" class="scroll-mt-20">
+    <div class="wrap pt-4 md:pt-6">
       <SectionHeading
         index="02"
-        title="Field notes"
-        aside="derived from the same fetch"
-        description="Five ways to read the year: where the new code concentrated, how many repositories cleared each star threshold, a composite that weights the harder tiers, how much the leaders dominate, and why the numbers can be trusted."
+        title="By star threshold"
+        aside={`${meta.languagesTracked} languages · all three tiers`}
+        description="The same three counts, ranked one threshold at a time. Switch the tier to see how the order moves between 2, 20 and 100 stars."
       />
-      <div class="grid gap-6 md:grid-cols-2">
+    </div>
+
+    <TierSwitch tiers={tiers} client:load />
+
+    <div class="wrap pb-20 md:pb-28"></div>
+  </section>
+
+  <section id="breakdowns" class="scroll-mt-20 border-t border-line bg-panel">
+    <div class="wrap py-20 md:py-28">
+      <SectionHeading
+        index="03"
+        title="Breakdowns"
+        aside="derived from the same fetch"
+        description="Four readings built from the same 117 counts: composition, threshold decay, concentration, and the method behind them. No extra requests, no estimates."
+      />
+
+      <div class="grid gap-x-10 gap-y-12 md:grid-cols-12">
         <CategoryBreakdown categories={data.categories} />
         <QualityLadder tiers={tiers} />
-        <WeightedRanking
-          ranked={data.weighted.ranked}
-          total={data.weighted.total}
-        />
         <Concentration
           top3Names={top3.map((language) => language.name)}
           top3Share={top3Share}
@@ -109,49 +125,73 @@ const datasetSchema = {
     </div>
   </section>
 
-  <section class="border-t border-border">
-    <div class="mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
-      <p class="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-        More rankings
-      </p>
-      <div class="mt-6 grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardContent className="flex h-full flex-col gap-6">
-            <div>
-              <CardTitle>Go frameworks</CardTitle>
-              <CardDescription className="mt-2">
-                Go web & RPC frameworks, ranked by how many packages import them
-                — live on pkg.go.dev data.
-              </CardDescription>
-            </div>
-            <a
-              href={`${base}go/`}
-              class={`${buttonVariants({ variant: "outline" })} mt-auto self-start`}
-            >
-              View ranking
-              <RiArrowRightLine data-icon="inline-end" />
-            </a>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex h-full flex-col gap-6">
-            <div>
-              <CardTitle>JS frameworks</CardTitle>
-              <CardDescription className="mt-2">
-                Full-stack JS frameworks, ranked by npm downloads over the
-                trailing 30 days — Next.js, Astro, SvelteKit, Nuxt, and
-                SolidStart.
-              </CardDescription>
-            </div>
-            <a
-              href={`${base}js/`}
-              class={`${buttonVariants({ variant: "outline" })} mt-auto self-start`}
-            >
-              View ranking
-              <RiArrowRightLine data-icon="inline-end" />
-            </a>
-          </CardContent>
-        </Card>
+  <section id="indexes" class="scroll-mt-20 border-t border-line">
+    <div class="wrap py-20 md:py-28">
+      <SectionHeading
+        index="04"
+        title="Other indexes"
+        aside="different sources, different bases"
+        description="Two smaller catalogs measured from separate public APIs. Go is counted as adoption stock — packages that import a framework today. JS is counted as install flow over the registry's trailing 30 days."
+      />
+
+      <div class="grid gap-px border border-line bg-line md:grid-cols-2">
+        <a
+          href={`${base}go/`}
+          class="group flex flex-col bg-canvas p-6 transition duration-200 hover:-translate-y-0.5 hover:bg-panel-2 sm:p-8"
+        >
+          <div class="flex items-baseline justify-between gap-4">
+            <span class="label">Go · pkg.go.dev</span>
+            <Icon
+              name="arrow-up-right"
+              size={16}
+              class="text-ink-faint transition-colors group-hover:text-accent"
+            />
+          </div>
+
+          <p class="num mt-10 text-[2.5rem] leading-none font-medium text-ink">
+            {formatCompact(goLeader.importers)}
+          </p>
+          <p class="label mt-2">packages import {goLeader.name}</p>
+
+          <h3 class="mt-8 text-title font-semibold text-ink">
+            Go web &amp; RPC frameworks
+          </h3>
+          <p class="mt-2 max-w-sm text-meta leading-relaxed text-ink-soft">
+            {go.meta.frameworksTracked} frameworks ranked by the imported-by
+            count of one canonical package each — a cumulative snapshot, not a
+            window.
+          </p>
+        </a>
+
+        <a
+          href={`${base}js/`}
+          class="group flex flex-col bg-canvas p-6 transition duration-200 hover:-translate-y-0.5 hover:bg-panel-2 sm:p-8"
+        >
+          <div class="flex items-baseline justify-between gap-4">
+            <span class="label">JS · npm registry</span>
+            <Icon
+              name="arrow-up-right"
+              size={16}
+              class="text-ink-faint transition-colors group-hover:text-accent"
+            />
+          </div>
+
+          <p class="num mt-10 text-[2.5rem] leading-none font-medium text-ink">
+            {formatCompact(jsLeader.downloads)}
+          </p>
+          <p class="label mt-2">
+            downloads of {jsLeader.npmPackage} in 30 days
+          </p>
+
+          <h3 class="mt-8 text-title font-semibold text-ink">
+            JS full-stack frameworks
+          </h3>
+          <p class="mt-2 max-w-sm text-meta leading-relaxed text-ink-soft">
+            {js.meta.frameworksTracked} meta-frameworks ranked by npm installs
+            between {formatDate(js.meta.window.from)} and{" "}
+            {formatDate(js.meta.window.to)}. Install events, not projects.
+          </p>
+        </a>
       </div>
     </div>
   </section>
