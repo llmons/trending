@@ -7,7 +7,7 @@
  * then renders all pages as static HTML from it.
  *
  * Three queries per language, one per star tier: the repositories that
- * cleared 2 / 20 / 100 stars. 39 languages × 3 tiers = 117 requests. In CI
+ * cleared 2 / 20 / 100 stars. 38 languages × 3 tiers = 114 requests. In CI
  * the auto-injected `GITHUB_TOKEN` grants the dedicated authenticated limit
  * (30 req/min ≈ 4.5 min); locally the build runs unauthenticated
  * (10 req/min ≈ 12 min).
@@ -19,7 +19,7 @@
  * ⚠ Server-only: never import a VALUE from this module in client code
  * (islands). The bundler would ship the fetch pipeline — including this
  * module's top-level await — into the browser bundle and every visitor
- * would start a 117-request fetch. Client code imports the data model
+ * would start a 114-request fetch. Client code imports the data model
  * from `@/lib/tiers` instead.
  *
  * Mock builds: `TRENDING_MOCK=1` (`pnpm build:mock` / `pnpm dev:mock`) swaps
@@ -127,7 +127,7 @@ async function fetchCountsRound(
   return failed
 }
 
-/** Live path: 117 paced GitHub searches, plus recovery rounds. */
+/** Live path: 114 paced GitHub searches, plus recovery rounds. */
 async function fetchCounts(window: RollingWindow): Promise<Counts> {
   const counts: Counts = new Map()
 

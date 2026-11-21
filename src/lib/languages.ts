@@ -145,14 +145,6 @@ export const LANGUAGE_CATALOG: readonly LanguageMeta[] = [
     blurb: "Functional programming on the JVM, powering big data stacks.",
   },
   {
-    id: "Erlang",
-    name: "Erlang",
-    color: "#B83998",
-    category: "general",
-    blurb:
-      "Fault-tolerant concurrency, the backbone of telecom infrastructure.",
-  },
-  {
     id: "Objective-C",
     name: "Objective-C",
     color: "#438eff",

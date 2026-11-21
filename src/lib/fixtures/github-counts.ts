@@ -41,7 +41,6 @@ export const MOCK_GITHUB_COUNTS: Record<string, MockGitHubCounts> = {
   Kotlin: { ge2: 8_800, ge20: 780, ge100: 70 },
   Dart: { ge2: 7_600, ge20: 640, ge100: 60 },
   Scala: { ge2: 3_400, ge20: 280, ge100: 25 },
-  Erlang: { ge2: 1_900, ge20: 150, ge100: 12 },
   "Objective-C": { ge2: 2_400, ge20: 190, ge100: 15 },
   Groovy: { ge2: 1_500, ge20: 110, ge100: 9 },
   Perl: { ge2: 1_300, ge20: 95, ge100: 7 },
@@ -49,8 +48,8 @@ export const MOCK_GITHUB_COUNTS: Record<string, MockGitHubCounts> = {
   // Zero-count edge case: the ≥100 tier must render without dividing by zero.
   VBScript: { ge2: 320, ge20: 8, ge100: 0 },
   "Visual Basic 6.0": { ge2: 480, ge20: 14, ge100: 1 },
-  // Ties with Erlang at the ≥100 tier exercise rank assignment.
-  "Visual Basic .NET": { ge2: 2_100, ge20: 160, ge100: 12 },
+  // Ties with Groovy at the ≥100 tier exercise rank assignment.
+  "Visual Basic .NET": { ge2: 2_100, ge20: 160, ge100: 9 },
   HTML: { ge2: 31_000, ge20: 1_800, ge100: 120 },
   CSS: { ge2: 27_000, ge20: 1_500, ge100: 90 },
   Vue: { ge2: 8_900, ge20: 760, ge100: 65 },
