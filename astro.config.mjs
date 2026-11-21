@@ -1,8 +1,8 @@
 // @ts-check
 
+import svelte from "@astrojs/svelte"
 import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "astro/config"
-import react from "@astrojs/react"
 
 // Local mock data (`pnpm build:mock`) must never reach a deployed build: fail
 // at config load, before any output is produced. `src/lib/data.ts` repeats the
@@ -23,5 +23,5 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  integrations: [react()],
+  integrations: [svelte()],
 })

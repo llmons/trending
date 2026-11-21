@@ -4,3 +4,11 @@ allowBuilds:
   esbuild: true
   sharp: true
   msw: false
+
+# `@astrojs/check` pulls `@napi-rs/wasm-runtime`, whose `@emnapi/runtime` peer
+# range also admits the 2.0.0 beta. The beta is not API-compatible with the
+# `@emnapi/core` that ships alongside it, which makes `astro check` crash on
+# import — pin the stable pair instead.
+overrides:
+  "@emnapi/core": 1.11.3
+  "@emnapi/runtime": 1.11.3
