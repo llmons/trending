@@ -25,7 +25,7 @@ export const STAR_TIERS = [
 export type TierId = (typeof STAR_TIERS)[number]["id"]
 
 /**
- * Weights for the composite "weighted ranking" in Field notes. Higher star
+ * Weights for the composite ranking that leads the home page. Higher star
  * thresholds carry more signal, so each tier's count is multiplied by its
  * weight and summed per language. Because the tiers are nested, a repository
  * that cleared every threshold contributes 1 + 2 + 4 = 7 points, while one
