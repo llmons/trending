@@ -1,19 +1,8 @@
 ---
-import { RiExternalLinkLine } from "@remixicon/react"
-
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import type { JsFrameworkRankings } from "@/lib/js-ranking"
+import Icon from "@/components/icon.astro"
 import { formatFull, formatPercent } from "@/lib/format"
+import type { JsFrameworkRankings } from "@/lib/js-ranking"
 import { npmPackageUrl } from "@/lib/npm"
-import { cn } from "@/lib/utils"
 
 interface Props {
   data: JsFrameworkRankings
@@ -38,78 +27,88 @@ function barWidth(downloads: number): number {
 }
 ---
 
-<Table className="min-w-[760px]">
-  <TableHeader>
-    <TableRow className="border-border">
-      <TableHead className="w-16">№</TableHead>
-      <TableHead>Framework</TableHead>
-      <TableHead>npm package</TableHead>
-      <TableHead className="text-right">Downloads (30d)</TableHead>
-      <TableHead className="w-56">Share of the group</TableHead>
-    </TableRow>
-  </TableHeader>
-  <TableBody>
-    {ranked.map((framework) => (
-      <TableRow className="group/row border-border/60">
-        <TableCell
-          className={cn(
-            "font-serif text-lg tabular-nums transition-colors group-hover/row:text-viz-accent",
-            framework.rank <= 3 ? "text-viz-accent" : "text-muted-foreground"
-          )}
-        >
-          {String(framework.rank).padStart(2, "0")}
-        </TableCell>
-        <TableCell>
-          <span class="flex items-center gap-3">
+<table class="dtable dtable--stack">
+  <thead>
+    <tr>
+      <th scope="col">№</th>
+      <th scope="col">Framework</th>
+      <th scope="col">npm package</th>
+      <th class="r" scope="col">
+        Downloads (30d)
+      </th>
+      <th scope="col">Share of group</th>
+    </tr>
+  </thead>
+  <tbody>
+    {ranked.map((framework, index) => (
+      <tr>
+        <td data-label="Rank">
+          <span
+            class:list={[
+              "num text-[0.8125rem]",
+              framework.rank <= 3 ? "text-accent" : "text-ink-faint",
+            ]}
+          >
+            {String(framework.rank).padStart(2, "0")}
+          </span>
+        </td>
+        <td data-label="Framework">
+          <span class="flex items-center gap-2.5">
             <span
-              aria-hidden
-              class="size-2.5 shrink-0 rounded-full"
+              class="size-1.5 shrink-0"
               style={`background-color: ${framework.color}`}
+              aria-hidden="true"
             />
             <a
               href={framework.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-1.5 font-heading text-sm font-semibold tracking-wider uppercase transition-colors hover:text-foreground"
+              class="group/link inline-flex items-center gap-1.5 text-[0.9375rem] font-medium text-ink"
             >
-              {framework.name}
-              <RiExternalLinkLine className="size-3.5 text-muted-foreground" />
+              <span class="link-draw">{framework.name}</span>
+              <Icon
+                name="arrow-up-right"
+                size={13}
+                class="text-ink-faint transition-colors group-hover/link:text-accent"
+              />
             </a>
           </span>
-        </TableCell>
-        <TableCell>
+        </td>
+        <td data-label="Package">
           <a
             href={npmPackageUrl(framework.npmPackage)}
             target="_blank"
             rel="noopener noreferrer"
-            class="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
+            class="font-mono text-[0.75rem] text-ink-soft transition-colors hover:text-accent"
           >
             {framework.npmPackage}
           </a>
-        </TableCell>
-        <TableCell className="text-right font-serif text-base tabular-nums">
-          {formatFull(framework.downloads)}
-        </TableCell>
-        <TableCell>
+        </td>
+        <td data-label="Downloads" class="r">
+          <span class="num text-[0.875rem] text-ink">
+            {formatFull(framework.downloads)}
+          </span>
+        </td>
+        <td data-label="Share">
           <div class="flex items-center gap-3">
-            <div class="h-1.5 min-w-12 grow bg-muted">
-              <div
-                class="h-full bg-viz-accent opacity-80 transition-opacity group-hover/row:opacity-100"
-                style={`width: ${barWidth(framework.downloads)}%`}
+            <span class="h-[3px] min-w-10 flex-1 overflow-hidden bg-panel-2">
+              <span
+                class="bar"
+                style={`--w:${barWidth(framework.downloads).toFixed(2)}%;--i:${index}`}
               />
-            </div>
-            <span class="w-16 text-right font-serif text-sm text-muted-foreground tabular-nums">
+            </span>
+            <span class="num w-11 text-right text-[0.75rem] text-ink-faint">
               {formatPercent(total > 0 ? framework.downloads / total : 0)}
             </span>
           </div>
-        </TableCell>
-      </TableRow>
+        </td>
+      </tr>
     ))}
-  </TableBody>
-  <TableCaption>
-    Downloads = npm installs of each framework's meta-framework package over the
-    trailing 30 days reported by the registry. Share = each framework's
-    percentage of the group total. Bars are log-scaled so the smaller frameworks
-    stay legible.
-  </TableCaption>
-</Table>
+  </tbody>
+</table>
+
+<p class="mt-4 max-w-3xl text-meta leading-relaxed text-ink-faint">
+  Downloads = npm installs of each framework's meta-framework package over the
+  trailing 30 days reported by the registry. Bars are log-scaled so the smaller
+  frameworks stay legible; share uses the raw counts.
+</p>
